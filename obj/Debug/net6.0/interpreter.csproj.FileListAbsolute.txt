@@ -1,0 +1,15 @@
+D:\study\cs\interpreter\bin\Debug\net6.0\interpreter.exe
+D:\study\cs\interpreter\bin\Debug\net6.0\interpreter.deps.json
+D:\study\cs\interpreter\bin\Debug\net6.0\interpreter.runtimeconfig.json
+D:\study\cs\interpreter\bin\Debug\net6.0\interpreter.dll
+D:\study\cs\interpreter\bin\Debug\net6.0\interpreter.pdb
+D:\study\cs\interpreter\obj\Debug\net6.0\interpreter.csproj.AssemblyReference.cache
+D:\study\cs\interpreter\obj\Debug\net6.0\interpreter.GeneratedMSBuildEditorConfig.editorconfig
+D:\study\cs\interpreter\obj\Debug\net6.0\interpreter.AssemblyInfoInputs.cache
+D:\study\cs\interpreter\obj\Debug\net6.0\interpreter.AssemblyInfo.cs
+D:\study\cs\interpreter\obj\Debug\net6.0\interpreter.csproj.CoreCompileInputs.cache
+D:\study\cs\interpreter\obj\Debug\net6.0\interpreter.dll
+D:\study\cs\interpreter\obj\Debug\net6.0\refint\interpreter.dll
+D:\study\cs\interpreter\obj\Debug\net6.0\interpreter.pdb
+D:\study\cs\interpreter\obj\Debug\net6.0\interpreter.genruntimeconfig.cache
+D:\study\cs\interpreter\obj\Debug\net6.0\ref\interpreter.dll
