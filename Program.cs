@@ -25,6 +25,8 @@ foreach (var tt in tests)
     Console.WriteLine("tests[%d] - literal wrong. expected=%s, got=%s", i, tt.expectedLiteral, tok.Literal);
     return;
   }
+
+  ++i;
 }
 
 class Test {

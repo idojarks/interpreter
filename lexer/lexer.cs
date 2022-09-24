@@ -15,11 +15,11 @@ namespace lexer {
       return new token.Token(tokenType, Convert.ToString(ch));
     }
 
-    public static bool isLetter(char ch) {
-      return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_';
+    bool isLetter(char ch) {
+      return char.IsLetter(ch) || ch == '_';
     }
 
-    public void readChar() {
+    void readChar() {
       if (readPosition >= input.Length)
       {
         ch = '\0';
@@ -33,7 +33,7 @@ namespace lexer {
       readPosition += 1;
     }
 
-    public string readIdentifier() {
+    string readIdentifier() {
       var startPos = position;
 
       while (isLetter(ch))
@@ -45,13 +45,16 @@ namespace lexer {
     }
 
     void skipWhiteSpace() {
-      
+      while (string.IsNullOrWhiteSpace(ch.ToString()))
+      {
+        readChar();
+      }
     }
 
     public token.Token NextToken() {
       token.Token tok;
 
-
+      skipWhiteSpace();
 
       switch (ch) {
         case '=':
