@@ -1,4 +1,8 @@
-﻿var input = "let five = 52;";
+﻿var input = @"let five = 52;
+  if (five == 5) {
+    return true;
+  }
+";
 
 var tests = new List<Test>();
 tests.Add(new Test(Token.LET, "let"));
@@ -6,6 +10,17 @@ tests.Add(new Test(Token.IDENT, "five"));
 tests.Add(new Test(Token.ASSIGN, "="));
 tests.Add(new Test(Token.INT, "52"));
 tests.Add(new Test(Token.SEMICOLON, ";"));
+tests.Add(new Test(Token.IF, "if"));
+tests.Add(new Test(Token.LPAREN, "("));
+tests.Add(new Test(Token.IDENT, "five"));
+tests.Add(new Test(Token.EQ, "=="));
+tests.Add(new Test(Token.INT, "5"));
+tests.Add(new Test(Token.RPAREN, ")"));
+tests.Add(new Test(Token.LBRACE, "{"));
+tests.Add(new Test(Token.RETURN, "return"));
+tests.Add(new Test(Token.TRUE, "true"));
+tests.Add(new Test(Token.SEMICOLON, ";"));
+tests.Add(new Test(Token.RBRACE, "}"));
 
 var	l = new lexer.Lexer(input);
 var i = 0;

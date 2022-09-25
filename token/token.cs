@@ -15,6 +15,9 @@ public class Token
   static public string ASTERISK = "*";
   static public string SLASH = "/";
 
+  static public string LT = "<";
+  static public string GT = ">";
+
   static public string COMMA = ",";
   static public string SEMICOLON = ";";
 
@@ -25,12 +28,25 @@ public class Token
 
   static public string FUNCTION = "FUNCTION";
   static public string LET = "LET";
+  static public string TRUE = "TRUE";
+  static public string FALSE = "FALSE";
+  static public string IF = "IF";
+  static public string ELSE = "ELSE";
+  static public string RETURN = "RETURN";
+
+  static public string EQ = "==";
+  static public string NOT_EQ = "!=";
 
   static Dictionary<string, TokenType> keywords = new();
   
   static Token() {
     keywords.Add("fn", FUNCTION);
     keywords.Add("let", LET);
+    keywords.Add("true", TRUE);
+    keywords.Add("false", FALSE);
+    keywords.Add("if", IF);
+    keywords.Add("else", ELSE);
+    keywords.Add("return", RETURN);
   }
 
   static public TokenType LookupIdent(string ident) {

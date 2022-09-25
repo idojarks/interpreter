@@ -69,6 +69,17 @@ namespace lexer {
       }
     }
 
+    char peekChar() {
+      if (readPosition >= input.Length)
+      {
+        return '\0';
+      }
+      else
+      {
+        return input[readPosition];
+      }
+    }
+
     public Token NextToken() {
       Token tok;
 
@@ -76,7 +87,48 @@ namespace lexer {
 
       switch (ch) {
         case '=':
-          tok = newToken(Token.ASSIGN, ch);
+          if (peekChar() == '=')
+          {
+            var c = ch;
+            readChar();
+            var literal = string.Concat(c, ch);
+
+            tok = new Token(Token.EQ, literal);
+          }
+          else 
+          {
+            tok = newToken(Token.ASSIGN, ch);
+          }
+          break;
+        case '+':
+          tok = newToken(Token.PLUS, ch);
+          break;
+        case '-':
+          tok = newToken(Token.MINUS, ch);
+          break;
+        case '!':
+          if (peekChar() == '=') {
+            var c = ch;
+            readChar();
+            var literal = string.Concat(c, ch);
+
+            tok = new Token(Token.NOT_EQ, literal);
+          }
+          else {
+            tok = newToken(Token.BANG, ch);
+          }
+          break;
+        case '/':
+          tok = newToken(Token.SLASH, ch);
+          break;
+        case '*':
+          tok = newToken(Token.ASTERISK, ch);
+          break;
+        case '<':
+          tok = newToken(Token.LT, ch);
+          break;
+        case '>':
+          tok = newToken(Token.GT, ch);
           break;
         case ';':
           tok = newToken(Token.SEMICOLON, ch);
@@ -89,9 +141,6 @@ namespace lexer {
           break;
         case ',':
           tok = newToken(Token.COMMA, ch);
-          break;
-        case '+':
-          tok = newToken(Token.PLUS, ch);
           break;
         case '{':
           tok = newToken(Token.LBRACE, ch);
