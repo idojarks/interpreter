@@ -11,8 +11,8 @@ namespace lexer {
     public int readPosition;
     public char ch;
 
-    public static token.Token newToken(TokenType tokenType, char ch) {
-      return new token.Token(tokenType, Convert.ToString(ch));
+    public static Token newToken(TokenType tokenType, char ch) {
+      return new Token(tokenType, Convert.ToString(ch));
     }
 
     bool isLetter(char ch) {
@@ -69,57 +69,57 @@ namespace lexer {
       }
     }
 
-    public token.Token NextToken() {
-      token.Token tok;
+    public Token NextToken() {
+      Token tok;
 
       skipWhiteSpace();
 
       switch (ch) {
         case '=':
-          tok = newToken(token.ASSIGN, ch);
+          tok = newToken(Token.ASSIGN, ch);
           break;
         case ';':
-          tok = newToken(token.SEMICOLON, ch);
+          tok = newToken(Token.SEMICOLON, ch);
           break;
         case '(':
-          tok = newToken(token.LPAREN, ch);
+          tok = newToken(Token.LPAREN, ch);
           break;
         case ')':
-          tok = newToken(token.RPAREN, ch);
+          tok = newToken(Token.RPAREN, ch);
           break;
         case ',':
-          tok = newToken(token.COMMA, ch);
+          tok = newToken(Token.COMMA, ch);
           break;
         case '+':
-          tok = newToken(token.PLUS, ch);
+          tok = newToken(Token.PLUS, ch);
           break;
         case '{':
-          tok = newToken(token.LBRACE, ch);
+          tok = newToken(Token.LBRACE, ch);
           break;
         case '}':
-          tok = newToken(token.RBRACE, ch);
+          tok = newToken(Token.RBRACE, ch);
           break;
         case '\0':
-          tok = new token.Token(token.EOF, "");
+          tok = new Token(Token.EOF, "");
           break;
         default:
           if (isLetter(ch)) {
             var ident = readIdentifier();
-            var tokenType = token.LookupIdent(ident);
+            var tokenType = Token.LookupIdent(ident);
 
-            tok = new token.Token(tokenType, ident);
+            tok = new Token(tokenType, ident);
 
             return tok;
           }
           else if (isDigit(ch)) {
             var result = readInt();
 
-            tok = new token.Token(token.INT, result);
+            tok = new Token(Token.INT, result);
 
             return tok;
           }
           else {
-            tok = newToken(token.ILLEGAL, ch);
+            tok = newToken(Token.ILLEGAL, ch);
           }
           break;
       }

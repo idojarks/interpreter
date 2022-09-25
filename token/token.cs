@@ -1,6 +1,6 @@
 global using TokenType = System.String;
 
-public class token
+public class Token
 {
   static public string ILLEGAL = "ILLEGAL";
   static public string EOF = "EOF";
@@ -10,6 +10,10 @@ public class token
 
   static public string ASSIGN = "=";
   static public string PLUS = "+";
+  static public string MINUS = "-";
+  static public string BANG = "!";
+  static public string ASTERISK = "*";
+  static public string SLASH = "/";
 
   static public string COMMA = ",";
   static public string SEMICOLON = ";";
@@ -24,9 +28,9 @@ public class token
 
   static Dictionary<string, TokenType> keywords = new();
   
-  static token() {
-    keywords.Add("fn", token.FUNCTION);
-    keywords.Add("let", token.LET);
+  static Token() {
+    keywords.Add("fn", FUNCTION);
+    keywords.Add("let", LET);
   }
 
   static public TokenType LookupIdent(string ident) {
@@ -37,16 +41,14 @@ public class token
       return tokenType;
     }
     
-    return token.IDENT;
+    return IDENT;
   }
 
-  public class Token {
-    public TokenType Type = "";
-    public string Literal = "";
+  public TokenType Type = "";
+  public string Literal = "";
 
-    public Token(TokenType tokenType, string literal) {
-      this.Type = tokenType;
-      this.Literal = literal;
-    }
-  }  
+  public Token(TokenType tokenType, string literal) {
+    this.Type = tokenType;
+    this.Literal = literal;
+  }
 }

@@ -1,11 +1,11 @@
 ﻿var input = "let five = 52;";
 
 var tests = new List<Test>();
-tests.Add(new Test(token.LET, "let"));
-tests.Add(new Test(token.IDENT, "five"));
-tests.Add(new Test(token.ASSIGN, "="));
-tests.Add(new Test(token.INT, "52"));
-tests.Add(new Test(token.SEMICOLON, ";"));
+tests.Add(new Test(Token.LET, "let"));
+tests.Add(new Test(Token.IDENT, "five"));
+tests.Add(new Test(Token.ASSIGN, "="));
+tests.Add(new Test(Token.INT, "52"));
+tests.Add(new Test(Token.SEMICOLON, ";"));
 
 var	l = new lexer.Lexer(input);
 var i = 0;
