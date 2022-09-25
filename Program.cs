@@ -1,4 +1,7 @@
-﻿var input = @"let five = 52;
+﻿new Repl().Start();
+
+/*
+var input = @"let five = 52;
   if (five == 5) {
     return true;
   }
@@ -22,7 +25,7 @@ tests.Add(new Test(Token.TRUE, "true"));
 tests.Add(new Test(Token.SEMICOLON, ";"));
 tests.Add(new Test(Token.RBRACE, "}"));
 
-var	l = new lexer.Lexer(input);
+var	l = new Lexer(input);
 var i = 0;
 
 foreach (var tt in tests)
@@ -55,3 +58,4 @@ class Test {
     expectedLiteral = literal;
   }
 }
+*/
