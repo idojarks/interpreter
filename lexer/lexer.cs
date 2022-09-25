@@ -19,6 +19,10 @@ namespace lexer {
       return char.IsLetter(ch) || ch == '_';
     }
 
+    bool isDigit(char ch) {
+      return char.IsDigit(ch);
+    }
+
     void readChar() {
       if (readPosition >= input.Length)
       {
@@ -40,6 +44,20 @@ namespace lexer {
       {
         readChar();
       }
+
+      return input.Substring(startPos, position - startPos);
+    }
+
+    string readInt() {
+      var startPos = position;
+
+      while (isDigit(ch)) {
+        readChar();
+      }
+/*
+      var intString = input.Substring(startPos, position - startPos);
+      int.TryParse(intString, out int result);
+      */
 
       return input.Substring(startPos, position - startPos);
     }
@@ -90,6 +108,13 @@ namespace lexer {
             var tokenType = token.LookupIdent(ident);
 
             tok = new token.Token(tokenType, ident);
+
+            return tok;
+          }
+          else if (isDigit(ch)) {
+            var result = readInt();
+
+            tok = new token.Token(token.INT, result);
 
             return tok;
           }
