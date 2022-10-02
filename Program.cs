@@ -1,61 +1,72 @@
-﻿new Repl().Start();
+﻿//new Repl().Start();
 
-/*
-var input = @"let five = 52;
-  if (five == 5) {
-    return true;
+void TestLetStatements() {
+  var input = @"
+    let x = 5;
+    let y = 10;
+    let foobar = 838383;
+  ";
+
+  var l = new Lexer(input);
+  var p = l.New();
+  var program = p.ParseProgram();
+
+  if (program == null) {
+    Console.WriteLine("no program");
+    return;
   }
-";
-
-var tests = new List<Test>();
-tests.Add(new Test(Token.LET, "let"));
-tests.Add(new Test(Token.IDENT, "five"));
-tests.Add(new Test(Token.ASSIGN, "="));
-tests.Add(new Test(Token.INT, "52"));
-tests.Add(new Test(Token.SEMICOLON, ";"));
-tests.Add(new Test(Token.IF, "if"));
-tests.Add(new Test(Token.LPAREN, "("));
-tests.Add(new Test(Token.IDENT, "five"));
-tests.Add(new Test(Token.EQ, "=="));
-tests.Add(new Test(Token.INT, "5"));
-tests.Add(new Test(Token.RPAREN, ")"));
-tests.Add(new Test(Token.LBRACE, "{"));
-tests.Add(new Test(Token.RETURN, "return"));
-tests.Add(new Test(Token.TRUE, "true"));
-tests.Add(new Test(Token.SEMICOLON, ";"));
-tests.Add(new Test(Token.RBRACE, "}"));
-
-var	l = new Lexer(input);
-var i = 0;
-
-foreach (var tt in tests)
-{
-  var tok = l.NextToken();
-
-  if (tok.Type != tt.expectedType)
-  {
-    Console.WriteLine("tests[{0}] - token type wrong. expected={1}, got={2}", i, tt.expectedType, tok.Type);
+  else if (program.Statements.Count != 3) {
+    Console.WriteLine("invalid statements count. expected= {0} got= {1}", 3, program.Statements.Count);
     return;
   }
 
-  if (tok.Literal != tt.expectedLiteral)
+  var expectedList = new string[] {"x", "y", "foobar"};
+
+  for (int i = 0; i < expectedList.Length; i++)
   {
-    Console.WriteLine("tests[{0}] - literal wrong. expected={1}, got={2}", i, tt.expectedLiteral, tok.Literal);
-    return;
+    var s = program.Statements[i];
+    var expected = expectedList[i];
+
+    if (!testLetStatement(s, expected)) {
+      return;
+    }
+
+    var ls = (LetStatement)s;
+
+    System.Console.WriteLine("{0} {1} {2}", ls.token.Literal, ls.name.TokenLiteral(), ls.value.TokenLiteral());
   }
 
-  ++i;
+  System.Console.WriteLine("done.");
 }
 
-Console.WriteLine("done.");
+bool testLetStatement(Statement s, string name) {
+  if (s.TokenLiteral() != "let") {
+    System.Console.WriteLine("s.TokenLiteral() not 'let'. got={0}", s.TokenLiteral());
 
-class Test {
-  public TokenType expectedType = "";
-  public string expectedLiteral = "";
-
-  public Test(TokenType tokenType, string literal) {
-    expectedType = tokenType;
-    expectedLiteral = literal;
+    return false;
   }
+
+  var letStmt = s as LetStatement;
+
+  if (letStmt == null) {
+    System.Console.WriteLine("s not LetStatement. got={0}", s.GetType().Name);
+
+    return false;
+  }
+  
+  if (letStmt.name?.value != name) {
+    System.Console.WriteLine("let statemnt name not {0}. got={1}", name, letStmt.name?.value);
+
+    return false;
+  }
+
+  if (letStmt.name.TokenLiteral() != name) {
+    System.Console.WriteLine("let statement TokenLiteral() not {0}. got={1}", name, letStmt.name.TokenLiteral());
+
+    return false;
+  }
+
+  return true;
 }
-*/
+
+TestLetStatements();

@@ -2,40 +2,40 @@ global using TokenType = System.String;
 
 public class Token
 {
-  static public string ILLEGAL = "ILLEGAL";
-  static public string EOF = "EOF";
+  public const string ILLEGAL = "ILLEGAL";
+  public const string EOF = "EOF";
 
-  static public string IDENT = "IDENT";
-  static public string INT = "INT";
+  public const string IDENT = "IDENT";
+  public const string INT = "INT";
 
-  static public string ASSIGN = "=";
-  static public string PLUS = "+";
-  static public string MINUS = "-";
-  static public string BANG = "!";
-  static public string ASTERISK = "*";
-  static public string SLASH = "/";
+  public const string ASSIGN = "=";
+  public const string PLUS = "+";
+  public const string MINUS = "-";
+  public const string BANG = "!";
+  public const string ASTERISK = "*";
+  public const string SLASH = "/";
 
-  static public string LT = "<";
-  static public string GT = ">";
+  public const string LT = "<";
+  public const string GT = ">";
 
-  static public string COMMA = ",";
-  static public string SEMICOLON = ";";
+  public const string COMMA = ",";
+  public const string SEMICOLON = ";";
 
-  static public string LPAREN = "(";
-  static public string RPAREN = ")";
-  static public string LBRACE = "{";
-  static public string RBRACE = "}";
+  public const string LPAREN = "(";
+  public const string RPAREN = ")";
+  public const string LBRACE = "{";
+  public const string RBRACE = "}";
 
-  static public string FUNCTION = "FUNCTION";
-  static public string LET = "LET";
-  static public string TRUE = "TRUE";
-  static public string FALSE = "FALSE";
-  static public string IF = "IF";
-  static public string ELSE = "ELSE";
-  static public string RETURN = "RETURN";
+  public const string FUNCTION = "FUNCTION";
+  public const string LET = "LET";
+  public const string TRUE = "TRUE";
+  public const string FALSE = "FALSE";
+  public const string IF = "IF";
+  public const string ELSE = "ELSE";
+  public const string RETURN = "RETURN";
 
-  static public string EQ = "==";
-  static public string NOT_EQ = "!=";
+  public const string EQ = "==";
+  public const string NOT_EQ = "!=";
 
   static Dictionary<string, TokenType> keywords = new();
   

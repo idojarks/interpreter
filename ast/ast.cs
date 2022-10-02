@@ -1,32 +1,25 @@
-interface Node {
+public interface Node {
   string TokenLiteral();
 }
 
-interface Statement : Node {
+public interface Statement : Node {
   void statementNode();
 }
 
-interface Expression : Node {
+public interface Expression : Node {
   void expressionNode();
 }
 
-class _Program {
-  Statement[] Statements = {};
+public class LetStatement : Statement {
+  public Token token;
+  public Identifier name;
+  public Expression value;
 
-  string TokenLiteral() {
-    if (Statements.Length > 0) {
-      return Statements[0].TokenLiteral();
-    }
-    else {
-      return "";
-    }
+  public LetStatement(Token t, Identifier i, Expression e) {
+    token = t;
+    name = i;
+    value = e;
   }
-}
-
-class LetStatement : Statement {
-  Token token = new (Token.LET, "let");
-  Identifier? name;
-  Expression? value;
 
   public void statementNode() {}
 
@@ -35,13 +28,31 @@ class LetStatement : Statement {
   }
 }
 
-class Identifier : Expression {
-  Token token = new (Token.IDENT, "");
-  string value = "";
+public class Identifier : Expression {
+  public Token token;
+  public string value;
+
+  public Identifier(Token t, string s) {
+    token = t;
+    value = s;
+  }
 
   public void expressionNode() {}
 
   public string TokenLiteral() {
     return token.Literal;
+  }
+}
+
+public class _Program {
+  public List<Statement> Statements = new();
+
+  public string TokenLiteral() {
+    if (Statements.Count > 0) {
+      return Statements[0].TokenLiteral();
+    }
+    else {
+      return "";
+    }
   }
 }

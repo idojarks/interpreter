@@ -1,14 +1,23 @@
 public class Lexer {
+  public string input;
+  public int position;
+  public int readPosition;
+  public char ch;
+
   public Lexer(string input) {
     this.input = input;
     
     readChar();
   }
 
-  public string input;
-  public int position;
-  public int readPosition;
-  public char ch;
+  public Parser New() {
+    var p = new Parser(this);
+
+    p.nextToken();
+    p.nextToken();
+
+    return p;
+  }
 
   public static Token newToken(TokenType tokenType, char ch) {
     return new Token(tokenType, Convert.ToString(ch));
