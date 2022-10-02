@@ -11,6 +11,11 @@ void TestLetStatements() {
   var p = l.New();
   var program = p.ParseProgram();
 
+  p.Errors().ForEach(delegate(string error) {
+    System.Console.WriteLine("parser error: {0}", error);
+    return;
+  });
+
   if (program == null) {
     Console.WriteLine("no program");
     return;

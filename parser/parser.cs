@@ -2,9 +2,19 @@ public class Parser {
   Lexer l;
   Token curToken = new(Token.ILLEGAL, "");
   Token peekToken = new(Token.ILLEGAL, "");
+  List<string> errors = new List<string>();
 
   public Parser(Lexer l) {
     this.l = l;
+  }
+
+  public List<string> Errors() {
+    return errors;
+  }
+
+  public void peekError(TokenType t) {
+    var msg = string.Format("peek expected {0}, got {1}", t, peekToken.Type);
+    errors.Add(msg);
   }
 
   public void nextToken() {
@@ -28,7 +38,7 @@ public class Parser {
       return true;
     }
     else {
-      System.Console.WriteLine("expectPeek expected= {0} got= {1}", t, peekToken.Type);
+      peekError(t);
 
       return false;
     }
