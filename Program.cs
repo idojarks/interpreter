@@ -1,5 +1,30 @@
 ﻿//new Repl().Start();
 
+void TestIndentifierExpression() {
+  var input = "5;";
+
+  var l = new Lexer(input);
+  var p = l.New();
+  var program = p.ParseProgram();
+
+  p.Errors().ForEach(delegate(string error) {
+    System.Console.WriteLine("parser error: {0}", error);
+    
+    return;
+  });
+
+  if (program.Statements.Count != 1) {
+    System.Console.WriteLine("error");
+
+    return;
+  }
+
+  System.Console.WriteLine(program.String());
+  System.Console.WriteLine(Token.EOF);
+}
+TestIndentifierExpression();
+
+/*
 void TestLetStatements() {
   var input = @"
     let x = 5;
@@ -28,3 +53,4 @@ void TestLetStatements() {
 }
 
 TestLetStatements();
+*/

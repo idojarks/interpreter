@@ -93,6 +93,26 @@ public class Identifier : Expression {
   }
 }
 
+public class IntegerLiteral : Expression {
+  public Token token;
+  public Int64 value;
+
+  public IntegerLiteral(Token t, Int64 v) {
+    token = t;
+    value = v;
+  }
+
+  public void expressionNode() {}
+
+  public string TokenLiteral() {
+    return token.Literal;
+  }
+
+  public string String() {
+    return token.Literal;
+  }
+}
+
 public class _Program {
   public List<Statement> Statements = new();
 

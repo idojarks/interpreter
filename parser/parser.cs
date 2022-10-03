@@ -1,15 +1,47 @@
 public class Parser {
   Lexer l;
+  List<string> errors = new List<string>();
+
   Token curToken = new(Token.ILLEGAL, "");
   Token peekToken = new(Token.ILLEGAL, "");
-  List<string> errors = new List<string>();
+  
+  Dictionary<TokenType, prefixParseFn> prefixParseFns = new();
+  Dictionary<TokenType, infixParseFn> infixParseFns = new();
+
+  enum OperatorPrecedences
+  {
+    LOWEST,
+    EQUALS,
+    LESSGREATER,
+    SUM,
+    PRODUCT,
+    PREFIX,
+    CALL,
+  }
+
+  public delegate Expression prefixParseFn();
+  public delegate Expression infixParseFn(Expression e);
 
   public Parser(Lexer l) {
     this.l = l;
+
+    nextToken();
+    nextToken();
+
+    registerPrefix(Token.IDENT, parseIdentifier);
+    registerPrefix(Token.INT, parseIntegerLiteral);
   }
 
   public List<string> Errors() {
     return errors;
+  }
+
+  public void registerPrefix(TokenType tokenType, prefixParseFn fn) {
+    prefixParseFns[tokenType] = fn;
+  }
+
+  public void registerInfix(TokenType tokenType, infixParseFn fn) {
+    infixParseFns[tokenType] = fn;
   }
 
   public void peekError(TokenType t) {
@@ -29,7 +61,7 @@ public class Parser {
       case Token.RETURN:
         return parseReturnStatement();
       default:
-        return null;
+        return parseExpressionStatement();;
     }
   }
 
@@ -92,6 +124,34 @@ public class Parser {
       t,
       new Identifier(num, num.Literal)
     );
+  }
+
+  Statement? parseExpressionStatement() {
+    var s = new ExpressionStatement(curToken, parseExpression(OperatorPrecedences.LOWEST));
+
+    if (peekToken.Type == Token.SEMICOLON) {
+      nextToken();
+    }
+
+    return s;
+  }
+
+  Expression? parseExpression(OperatorPrecedences precedence) {
+    var prefix = prefixParseFns[curToken.Type];
+
+    if (prefix == null) {
+      return null;
+    }
+
+    return prefix();
+  }
+
+  Expression parseIdentifier() {
+    return new Identifier(curToken, curToken.Literal);
+  }
+
+  Expression parseIntegerLiteral() {
+    return new IntegerLiteral(curToken, Convert.ToInt64(curToken.Literal));
   }
 
   public _Program ParseProgram() {

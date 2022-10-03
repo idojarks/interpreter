@@ -11,12 +11,7 @@ public class Lexer {
   }
 
   public Parser New() {
-    var p = new Parser(this);
-
-    p.nextToken();
-    p.nextToken();
-
-    return p;
+    return new Parser(this);
   }
 
   public static Token newToken(TokenType tokenType, char ch) {
