@@ -26,6 +26,8 @@ public class Parser {
     switch (curToken.Type) {
       case Token.LET:
         return parseLetStatement();
+      case Token.RETURN:
+        return parseReturnStatement();
       default:
         return null;
     }
@@ -67,6 +69,27 @@ public class Parser {
     return new LetStatement(
       token,
       new Identifier(ident, ident.Literal),
+      new Identifier(num, num.Literal)
+    );
+  }
+
+  Statement? parseReturnStatement() {
+    var t = curToken;
+
+    nextToken();
+
+    if (curToken.Type == Token.SEMICOLON) {
+      return new ReturnStatement(t, null);
+    }
+
+    var num = curToken;
+
+    while (curToken.Type != Token.SEMICOLON) {
+      nextToken();
+    }
+
+    return new ReturnStatement(
+      t,
       new Identifier(num, num.Literal)
     );
   }

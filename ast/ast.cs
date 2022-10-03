@@ -1,5 +1,6 @@
 public interface Node {
   string TokenLiteral();
+  string String();
 }
 
 public interface Statement : Node {
@@ -13,9 +14,9 @@ public interface Expression : Node {
 public class LetStatement : Statement {
   public Token token;
   public Identifier name;
-  public Expression value;
+  public Expression? value;
 
-  public LetStatement(Token t, Identifier i, Expression e) {
+  public LetStatement(Token t, Identifier i, Expression? e=null) {
     token = t;
     name = i;
     value = e;
@@ -25,6 +26,50 @@ public class LetStatement : Statement {
 
   public string TokenLiteral() {
     return token.Literal;
+  }
+
+  public string String() {
+    return $"{TokenLiteral()} {name.String()} = {value?.String()};";
+  }
+}
+
+public class ReturnStatement : Statement {
+  public Token token;
+  public Expression? returnValue;
+
+  public ReturnStatement(Token t, Expression? e) {
+    token = t;
+    returnValue = e;
+  }
+
+  public void statementNode() {}
+
+  public string TokenLiteral() {
+    return token.Literal;
+  }
+
+  public string String() {
+    return $"{TokenLiteral()} {returnValue?.String()};";
+  }
+}
+
+public class ExpressionStatement : Statement {
+  public Token token;
+  Expression? expression;
+
+  public ExpressionStatement(Token t, Expression? e=null) {
+    token = t;
+    expression = e;
+  }
+
+  public void statementNode() {}
+
+  public string TokenLiteral() {
+    return token.Literal;
+  }
+
+  public string String() {
+    return $"{expression?.String()}";
   }
 }
 
@@ -42,6 +87,10 @@ public class Identifier : Expression {
   public string TokenLiteral() {
     return token.Literal;
   }
+
+  public string String() {
+    return value;
+  }
 }
 
 public class _Program {
@@ -54,5 +103,16 @@ public class _Program {
     else {
       return "";
     }
+  }
+
+  public string String() {
+    StringWriter writer = new ();
+
+    foreach (var item in Statements)
+    {
+      writer.WriteLine(item.String());
+    }
+
+    return writer.ToString();
   }
 }
