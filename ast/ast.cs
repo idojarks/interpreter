@@ -1,115 +1,102 @@
-public interface Node {
-  string TokenLiteral();
-  string String();
-}
-
-public interface Statement : Node {
-  void statementNode();
-}
-
-public interface Expression : Node {
-  void expressionNode();
-}
-
-public class LetStatement : Statement {
+public abstract class Node {
   public Token token;
-  public Identifier name;
-  public Expression? value;
 
-  public LetStatement(Token t, Identifier i, Expression? e=null) {
+  public Node(Token t) {
     token = t;
-    name = i;
-    value = e;
   }
-
-  public void statementNode() {}
 
   public string TokenLiteral() {
     return token.Literal;
   }
 
-  public string String() {
+  public abstract string String();
+}
+
+public abstract class Statement : Node {
+  public Statement(Token t) : base(t) {}
+
+  void statementNode() {}
+}
+
+public abstract class Expression : Node {
+  public Expression(Token t) : base(t) {}
+
+  void expressionNode() {}
+}
+
+public class LetStatement : Statement {
+  public Identifier name;
+  public Expression? value;
+
+  public LetStatement(Token t, Identifier i, Expression? e=null) : base(t) {
+    name = i;
+    value = e;
+  }
+
+  override public string String() {
     return $"{TokenLiteral()} {name.String()} = {value?.String()};";
   }
 }
 
 public class ReturnStatement : Statement {
-  public Token token;
   public Expression? returnValue;
 
-  public ReturnStatement(Token t, Expression? e) {
-    token = t;
+  public ReturnStatement(Token t, Expression? e) : base(t) {
     returnValue = e;
   }
 
-  public void statementNode() {}
-
-  public string TokenLiteral() {
-    return token.Literal;
-  }
-
-  public string String() {
+  override public string String() {
     return $"{TokenLiteral()} {returnValue?.String()};";
   }
 }
 
 public class ExpressionStatement : Statement {
-  public Token token;
   Expression? expression;
 
-  public ExpressionStatement(Token t, Expression? e=null) {
-    token = t;
+  public ExpressionStatement(Token t, Expression? e=null) : base(t) {
     expression = e;
   }
 
-  public void statementNode() {}
-
-  public string TokenLiteral() {
-    return token.Literal;
-  }
-
-  public string String() {
+  override public string String() {
     return $"{expression?.String()}";
   }
 }
 
 public class Identifier : Expression {
-  public Token token;
   public string value;
 
-  public Identifier(Token t, string s) {
-    token = t;
+  public Identifier(Token t, string s) : base(t) {
     value = s;
   }
 
-  public void expressionNode() {}
-
-  public string TokenLiteral() {
-    return token.Literal;
-  }
-
-  public string String() {
+  override public string String() {
     return value;
   }
 }
 
 public class IntegerLiteral : Expression {
-  public Token token;
   public Int64 value;
 
-  public IntegerLiteral(Token t, Int64 v) {
-    token = t;
+  public IntegerLiteral(Token t, Int64 v) : base(t) {
     value = v;
   }
 
-  public void expressionNode() {}
-
-  public string TokenLiteral() {
+  override public string String() {
     return token.Literal;
   }
+}
 
-  public string String() {
-    return token.Literal;
+public class PrefixExpression : Expression {
+  public string op;
+  public Expression right;
+
+  public PrefixExpression(Token t, string o, Expression e) : base(t) {
+    op = o;
+    right = e;
+  }
+
+  override public string String() {
+    return $"({op}{right.String()})";
   }
 }
 
