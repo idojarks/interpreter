@@ -30,6 +30,8 @@ public class Parser {
 
     registerPrefix(Token.IDENT, parseIdentifier);
     registerPrefix(Token.INT, parseIntegerLiteral);
+    registerPrefix(Token.BANG, parsePrefixExpression);
+    registerPrefix(Token.MINUS, parsePrefixExpression);
   }
 
   public List<string> Errors() {
@@ -137,9 +139,9 @@ public class Parser {
   }
 
   Expression? parseExpression(OperatorPrecedences precedence) {
-    var prefix = prefixParseFns[curToken.Type];
+    if (!prefixParseFns.TryGetValue(curToken.Type, out var prefix)) {
+      errors.Add($"no prefix parse function for {curToken.Type} found");
 
-    if (prefix == null) {
       return null;
     }
 
@@ -152,6 +154,16 @@ public class Parser {
 
   Expression parseIntegerLiteral() {
     return new IntegerLiteral(curToken, Convert.ToInt64(curToken.Literal));
+  }
+
+  Expression parsePrefixExpression() {
+    var t = curToken;
+
+    nextToken();
+
+    var e = parseExpression(OperatorPrecedences.PREFIX);
+
+    return new PrefixExpression(t, t.Literal, e);
   }
 
   public _Program ParseProgram() {

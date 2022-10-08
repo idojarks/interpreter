@@ -1,7 +1,7 @@
 ﻿//new Repl().Start();
 
 void TestIndentifierExpression() {
-  var input = "5;";
+  var input = "5-5;";
 
   var l = new Lexer(input);
   var p = l.New();

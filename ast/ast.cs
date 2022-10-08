@@ -88,15 +88,15 @@ public class IntegerLiteral : Expression {
 
 public class PrefixExpression : Expression {
   public string op;
-  public Expression right;
+  public Expression? right;
 
-  public PrefixExpression(Token t, string o, Expression e) : base(t) {
+  public PrefixExpression(Token t, string o, Expression? e) : base(t) {
     op = o;
     right = e;
   }
 
   override public string String() {
-    return $"({op}{right.String()})";
+    return $"({op}{right?.String()})";
   }
 }
 
