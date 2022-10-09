@@ -8,6 +8,18 @@ public class Parser {
   Dictionary<TokenType, prefixParseFn> prefixParseFns = new();
   Dictionary<TokenType, infixParseFn> infixParseFns = new();
 
+  Dictionary<TokenType, OperatorPrecedences> precedences = new()
+  {
+    {Token.EQ, OperatorPrecedences.EQUALS},
+    {Token.NOT_EQ, OperatorPrecedences.EQUALS},
+    {Token.LT, OperatorPrecedences.LESSGREATER},
+    {Token.GT, OperatorPrecedences.LESSGREATER},
+    {Token.PLUS, OperatorPrecedences.SUM},
+    {Token.MINUS, OperatorPrecedences.SUM},
+    {Token.SLASH, OperatorPrecedences.PRODUCT},
+    {Token.ASTERISK, OperatorPrecedences.PRODUCT},
+  };
+
   enum OperatorPrecedences
   {
     LOWEST,
@@ -32,6 +44,15 @@ public class Parser {
     registerPrefix(Token.INT, parseIntegerLiteral);
     registerPrefix(Token.BANG, parsePrefixExpression);
     registerPrefix(Token.MINUS, parsePrefixExpression);
+    
+    registerInfix(Token.PLUS, parseInfixExpression);
+    registerInfix(Token.MINUS, parseInfixExpression);
+    registerInfix(Token.SLASH, parseInfixExpression);
+    registerInfix(Token.ASTERISK, parseInfixExpression);
+    registerInfix(Token.EQ, parseInfixExpression);
+    registerInfix(Token.NOT_EQ, parseInfixExpression);
+    registerInfix(Token.LT, parseInfixExpression);
+    registerInfix(Token.GT, parseInfixExpression);
   }
 
   public List<string> Errors() {
@@ -145,7 +166,19 @@ public class Parser {
       return null;
     }
 
-    return prefix();
+    var leftExp = prefix();
+
+    while ((peekToken.Type != Token.SEMICOLON) && (precedence < peekPrecedence())) {
+      if (!infixParseFns.TryGetValue(peekToken.Type, out var infix)) {
+        return leftExp;
+      }
+
+      nextToken();
+
+      leftExp = infix(leftExp);
+    }
+
+    return leftExp;
   }
 
   Expression parseIdentifier() {
@@ -164,6 +197,31 @@ public class Parser {
     var e = parseExpression(OperatorPrecedences.PREFIX);
 
     return new PrefixExpression(t, t.Literal, e);
+  }
+
+  OperatorPrecedences peekPrecedence() {
+    if (precedences.TryGetValue(peekToken.Type, out var p)) {
+      return p;
+    }
+
+    return OperatorPrecedences.LOWEST;
+  }
+
+  OperatorPrecedences curPrecedence() {
+    if (precedences.TryGetValue(curToken.Type, out var p)) {
+      return p;
+    }
+
+    return OperatorPrecedences.LOWEST;
+  }
+
+  Expression parseInfixExpression(Expression left) {
+    var t = curToken;
+    var p = curPrecedence();
+    nextToken();
+    var r = parseExpression(p);
+
+    return new InfixExpression(t, left, t.Literal, r);
   }
 
   public _Program ParseProgram() {

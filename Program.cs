@@ -1,7 +1,10 @@
 ﻿//new Repl().Start();
 
 void TestIndentifierExpression() {
-  var input = "5-5;";
+  var input = @"
+ -5+5
+  
+  ";
 
   var l = new Lexer(input);
   var p = l.New();
@@ -12,12 +15,6 @@ void TestIndentifierExpression() {
     
     return;
   });
-
-  if (program.Statements.Count != 1) {
-    System.Console.WriteLine("error");
-
-    return;
-  }
 
   System.Console.WriteLine(program.String());
   System.Console.WriteLine(Token.EOF);

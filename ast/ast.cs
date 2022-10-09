@@ -100,6 +100,22 @@ public class PrefixExpression : Expression {
   }
 }
 
+public class InfixExpression : Expression {
+  public Expression left;
+  public string op;
+  public Expression? right;
+
+  public InfixExpression(Token t, Expression l, string o, Expression? r) : base(t) {
+    left = l;
+    op = o;
+    right = r;
+  }
+
+  override public string String() {
+    return $"({left.String()} {op} {right?.String()})";
+  }
+}
+
 public class _Program {
   public List<Statement> Statements = new();
 
