@@ -43,8 +43,7 @@ public class Lexer {
   string readIdentifier() {
     var startPos = position;
 
-    while (isLetter(ch))
-    {
+    while (isLetter(ch)) {
       readChar();
     }
 

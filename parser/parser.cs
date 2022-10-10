@@ -44,6 +44,8 @@ public class Parser {
     registerPrefix(Token.INT, parseIntegerLiteral);
     registerPrefix(Token.BANG, parsePrefixExpression);
     registerPrefix(Token.MINUS, parsePrefixExpression);
+    registerPrefix(Token.TRUE, parseBoolean);
+    registerPrefix(Token.FALSE, parseBoolean);
     
     registerInfix(Token.PLUS, parseInfixExpression);
     registerInfix(Token.MINUS, parseInfixExpression);
@@ -197,6 +199,12 @@ public class Parser {
     var e = parseExpression(OperatorPrecedences.PREFIX);
 
     return new PrefixExpression(t, t.Literal, e);
+  }
+
+  Expression parseBoolean() {
+    var v = curToken.Type == Token.TRUE ? true : false;
+    
+    return new Boolean(curToken, v);
   }
 
   OperatorPrecedences peekPrecedence() {

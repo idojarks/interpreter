@@ -33,7 +33,7 @@ public class LetStatement : Statement {
     value = e;
   }
 
-  override public string String() {
+  public override string String() {
     return $"{TokenLiteral()} {name.String()} = {value?.String()};";
   }
 }
@@ -45,7 +45,7 @@ public class ReturnStatement : Statement {
     returnValue = e;
   }
 
-  override public string String() {
+  public override string String() {
     return $"{TokenLiteral()} {returnValue?.String()};";
   }
 }
@@ -57,7 +57,7 @@ public class ExpressionStatement : Statement {
     expression = e;
   }
 
-  override public string String() {
+  public override string String() {
     return $"{expression?.String()}";
   }
 }
@@ -69,7 +69,7 @@ public class Identifier : Expression {
     value = s;
   }
 
-  override public string String() {
+  public override string String() {
     return value;
   }
 }
@@ -81,7 +81,7 @@ public class IntegerLiteral : Expression {
     value = v;
   }
 
-  override public string String() {
+  public override string String() {
     return token.Literal;
   }
 }
@@ -95,7 +95,7 @@ public class PrefixExpression : Expression {
     right = e;
   }
 
-  override public string String() {
+  public override string String() {
     return $"({op}{right?.String()})";
   }
 }
@@ -111,8 +111,21 @@ public class InfixExpression : Expression {
     right = r;
   }
 
-  override public string String() {
+  public override string String() {
     return $"({left.String()} {op} {right?.String()})";
+  }
+}
+
+public class Boolean : Expression {
+  public bool value;
+
+  public Boolean(Token t, bool v) : base(t) {
+    value = v;
+  }
+
+  public override string String()
+  {
+    return $"{token.Literal}";
   }
 }
 

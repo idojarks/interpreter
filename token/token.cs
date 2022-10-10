@@ -50,9 +50,7 @@ public class Token
   }
 
   static public TokenType LookupIdent(string ident) {
-    TokenType? tokenType;
-
-    if (keywords.TryGetValue(ident, out tokenType))
+    if (keywords.TryGetValue(ident, out var tokenType))
     {
       return tokenType;
     }

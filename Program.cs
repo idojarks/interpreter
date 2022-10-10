@@ -2,8 +2,9 @@
 
 void TestIndentifierExpression() {
   var input = @"
- -5+5
-  
+  true;
+  false;
+  let v = true;  
   ";
 
   var l = new Lexer(input);
