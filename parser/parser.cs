@@ -47,6 +47,7 @@ public class Parser {
     registerPrefix(Token.TRUE, parseBoolean);
     registerPrefix(Token.FALSE, parseBoolean);
     registerPrefix(Token.LPAREN, parseGroupedExpression);
+    registerPrefix(Token.IF, parseIfExpression);
     
     registerInfix(Token.PLUS, parseInfixExpression);
     registerInfix(Token.MINUS, parseInfixExpression);
@@ -152,6 +153,24 @@ public class Parser {
     );
   }
 
+  BlockStatement? parseBlockStatement() {
+    var block = new BlockStatement();
+
+    nextToken();
+
+    while (curToken.Type != Token.RBRACE && curToken.Type != Token.EOF) {
+      var s = parseStatement();
+
+      if (s != null) {
+        block.statements.Add(s);
+      }
+
+      nextToken();
+    }
+
+    return block;
+  }
+
   Statement? parseExpressionStatement() {
     var s = new ExpressionStatement(curToken, parseExpression(OperatorPrecedences.LOWEST));
 
@@ -218,6 +237,44 @@ public class Parser {
     }
 
     return expr;
+  }
+
+  Expression parseIfExpression() {
+    var tokenIf = curToken;
+
+    if (!expectPeek(Token.LPAREN)) {
+      return new InvalidExpression();
+    }
+    
+    nextToken();
+
+    var condition = parseExpression(OperatorPrecedences.LOWEST);
+
+    if (!expectPeek(Token.RPAREN)) {
+      return new InvalidExpression();
+    }
+
+    if (!expectPeek(Token.LBRACE)) {
+      return new InvalidExpression();
+    }
+
+    var consequence = parseBlockStatement();
+    
+    BlockStatement? alternative = null;
+
+    if (peekToken.Type == Token.ELSE) {
+      nextToken();
+
+      if (!expectPeek(Token.LBRACE)) {
+        return new InvalidExpression();
+      }
+
+      alternative = parseBlockStatement();
+    }
+
+    return (consequence == null) 
+      ? new InvalidExpression()
+      : new IfExpression(tokenIf, condition, consequence, alternative);
   }
 
   OperatorPrecedences peekPrecedence() {

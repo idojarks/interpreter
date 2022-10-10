@@ -71,6 +71,23 @@ public class ExpressionStatement : Statement {
   }
 }
 
+public class BlockStatement : Statement {
+  public List<Statement> statements = new();
+
+  public BlockStatement() : base(new Token(Token.LBRACE, Token.LBRACE)) {}
+
+  public override string String()
+  {
+    StringWriter w = new();
+
+    statements.ForEach(delegate(Statement s) {
+      w.Write(s.String());
+    });
+
+    return w.ToString();
+  }
+}
+
 public class Identifier : Expression {
   public string value;
 
@@ -135,6 +152,29 @@ public class Boolean : Expression {
   public override string String()
   {
     return $"{token.Literal}";
+  }
+}
+
+public class IfExpression : Expression {
+  Expression condition;
+  BlockStatement consequence;
+  BlockStatement? alternative;
+
+  public IfExpression(Token t, Expression cd, BlockStatement c, BlockStatement? a=null) : base(t) {
+    condition = cd;
+    consequence = c;
+    alternative = a;
+  }
+
+  public override string String()
+  {
+    string? alt = null;
+
+    if (alternative != null) {
+      alt = $"else {alternative.String()}";
+    }
+
+    return $"if {condition.String()} {consequence.String()} {alt}";
   }
 }
 

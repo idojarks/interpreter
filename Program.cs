@@ -2,7 +2,7 @@
 
 void TestIndentifierExpression() {
   var input = @"
-    (3+4)*5;
+    if (x<y) {x} else {y}
   ";
 
   var l = new Lexer(input);
