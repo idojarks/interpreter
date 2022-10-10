@@ -46,6 +46,7 @@ public class Parser {
     registerPrefix(Token.MINUS, parsePrefixExpression);
     registerPrefix(Token.TRUE, parseBoolean);
     registerPrefix(Token.FALSE, parseBoolean);
+    registerPrefix(Token.LPAREN, parseGroupedExpression);
     
     registerInfix(Token.PLUS, parseInfixExpression);
     registerInfix(Token.MINUS, parseInfixExpression);
@@ -161,11 +162,11 @@ public class Parser {
     return s;
   }
 
-  Expression? parseExpression(OperatorPrecedences precedence) {
+  Expression parseExpression(OperatorPrecedences precedence) {
     if (!prefixParseFns.TryGetValue(curToken.Type, out var prefix)) {
       errors.Add($"no prefix parse function for {curToken.Type} found");
 
-      return null;
+      return new InvalidExpression();
     }
 
     var leftExp = prefix();
@@ -203,8 +204,20 @@ public class Parser {
 
   Expression parseBoolean() {
     var v = curToken.Type == Token.TRUE ? true : false;
-    
+
     return new Boolean(curToken, v);
+  }
+
+  Expression parseGroupedExpression() {
+    nextToken();
+
+    var expr = parseExpression(OperatorPrecedences.LOWEST);
+
+    if (!expectPeek(Token.RPAREN)) {
+      return new InvalidExpression();
+    }
+
+    return expr;
   }
 
   OperatorPrecedences peekPrecedence() {

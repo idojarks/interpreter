@@ -24,6 +24,15 @@ public abstract class Expression : Node {
   void expressionNode() {}
 }
 
+public class InvalidExpression : Expression {
+  public InvalidExpression() : base(new Token(Token.ILLEGAL, Token.ILLEGAL)) {}
+
+  public override string String()
+  {
+    return token.Literal;
+  }
+}
+
 public class LetStatement : Statement {
   public Identifier name;
   public Expression? value;
