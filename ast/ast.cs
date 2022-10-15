@@ -178,6 +178,33 @@ public class IfExpression : Expression {
   }
 }
 
+public class FunctionLiteral : Expression {
+  public List<Identifier>? parameters;
+  public BlockStatement? body;
+
+  public FunctionLiteral(Token t) : base(t) {}
+
+  public override string String()
+  {
+    if (parameters == null) {
+      return "";
+    }
+
+    StringWriter writer = new();
+
+    for (int i = 0; i < parameters.Count; i++)
+    {
+      writer.Write(parameters[i].String());
+
+      if (i + 1 < parameters.Count) {
+        writer.Write(", ");
+      }
+    }
+    
+    return $"{TokenLiteral()}({writer.ToString()}) {{ {body?.String()} }}";
+  }
+}
+
 public class _Program {
   public List<Statement> Statements = new();
 

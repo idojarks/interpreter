@@ -48,6 +48,7 @@ public class Parser {
     registerPrefix(Token.FALSE, parseBoolean);
     registerPrefix(Token.LPAREN, parseGroupedExpression);
     registerPrefix(Token.IF, parseIfExpression);
+    registerPrefix(Token.FUNCTION, parseFunctionLiteral);
     
     registerInfix(Token.PLUS, parseInfixExpression);
     registerInfix(Token.MINUS, parseInfixExpression);
@@ -275,6 +276,53 @@ public class Parser {
     return (consequence == null) 
       ? new InvalidExpression()
       : new IfExpression(tokenIf, condition, consequence, alternative);
+  }
+
+  Expression parseFunctionLiteral() {
+    var fl = new FunctionLiteral(curToken);
+
+    if (!expectPeek(Token.LPAREN)) {
+      return new InvalidExpression();
+    }
+
+    fl.parameters = parseFunctionParameters();
+
+    if (fl.parameters == null) {
+      return new InvalidExpression();
+    }
+
+    if (!expectPeek(Token.LBRACE)) {
+      return new InvalidExpression();
+    }
+
+    fl.body = parseBlockStatement();
+
+    return fl;
+  }
+
+  List<Identifier>? parseFunctionParameters() {
+    List<Identifier> identifiers = new();
+
+    if (peekToken.Type == Token.RPAREN) {
+      return identifiers;
+    }
+
+    nextToken();
+
+    identifiers.Add(new Identifier(curToken, curToken.Literal)); 
+
+    while (peekToken.Type == Token.COMMA) {
+      nextToken();
+      nextToken();
+
+      identifiers.Add(new Identifier(curToken, curToken.Literal));
+    }
+
+    if (!expectPeek(Token.RPAREN)) {
+      return null;
+    }
+
+    return identifiers;
   }
 
   OperatorPrecedences peekPrecedence() {

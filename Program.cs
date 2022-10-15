@@ -2,7 +2,7 @@
 
 void TestIndentifierExpression() {
   var input = @"
-    if (x<y) {x} else {y}
+    fn(x, y) { x+y; }
   ";
 
   var l = new Lexer(input);
