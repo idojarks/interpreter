@@ -186,22 +186,47 @@ public class FunctionLiteral : Expression {
 
   public override string String()
   {
-    if (parameters == null) {
-      return "";
-    }
-
     StringWriter writer = new();
 
-    for (int i = 0; i < parameters.Count; i++)
-    {
-      writer.Write(parameters[i].String());
+    if (parameters != null) {
+      for (int i = 0; i < parameters.Count; i++)
+      {
+        writer.Write(parameters[i].String());
 
-      if (i + 1 < parameters.Count) {
-        writer.Write(", ");
+        if (i + 1 < parameters.Count) {
+          writer.Write(", ");
+        }
       }
     }
     
     return $"{TokenLiteral()}({writer.ToString()}) {{ {body?.String()} }}";
+  }
+}
+
+public class CallExpression : Expression {
+  public Expression function;
+  public List<Expression>? arguments;
+
+  public CallExpression(Token t, Expression f) : base(t) {
+    function = f;
+  }
+
+  public override string String()
+  {
+    StringWriter writer = new();
+
+    if (arguments != null) {
+      for (int i = 0; i < arguments.Count; i++)
+      {
+        writer.Write(arguments[i].String());
+
+        if (i + 1 < arguments.Count) {
+          writer.Write(", ");
+        }
+      }
+    }
+    
+    return $"{function.String()}({writer.ToString()})";
   }
 }
 

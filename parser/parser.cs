@@ -18,6 +18,7 @@ public class Parser {
     {Token.MINUS, OperatorPrecedences.SUM},
     {Token.SLASH, OperatorPrecedences.PRODUCT},
     {Token.ASTERISK, OperatorPrecedences.PRODUCT},
+    {Token.LPAREN, OperatorPrecedences.CALL},
   };
 
   enum OperatorPrecedences
@@ -58,6 +59,7 @@ public class Parser {
     registerInfix(Token.NOT_EQ, parseInfixExpression);
     registerInfix(Token.LT, parseInfixExpression);
     registerInfix(Token.GT, parseInfixExpression);
+    registerInfix(Token.LPAREN, parseCallExpression);
   }
 
   public List<string> Errors() {
@@ -325,6 +327,50 @@ public class Parser {
     return identifiers;
   }
 
+  Expression parseInfixExpression(Expression left) {
+    var t = curToken;
+    var p = curPrecedence();
+    nextToken();
+    var r = parseExpression(p);
+
+    return new InfixExpression(t, left, t.Literal, r);
+  }
+
+  Expression parseCallExpression(Expression function) {
+    var ce = new CallExpression(curToken, function);
+    
+    ce.arguments = parseCallArguments();
+
+    return ce;
+  }
+
+  List<Expression>? parseCallArguments() {
+    List<Expression> args = new();
+
+    if (peekToken.Type == Token.RPAREN) {
+      nextToken();
+
+      return args;
+    }
+
+    nextToken();
+
+    args.Add(parseExpression(OperatorPrecedences.LOWEST));
+
+    while (peekToken.Type == Token.COMMA) {
+      nextToken();
+      nextToken();
+
+      args.Add(parseExpression(OperatorPrecedences.LOWEST));
+    }
+
+    if (!expectPeek(Token.RPAREN)) {
+      return null;
+    }
+
+    return args;
+  }
+
   OperatorPrecedences peekPrecedence() {
     if (precedences.TryGetValue(peekToken.Type, out var p)) {
       return p;
@@ -339,15 +385,6 @@ public class Parser {
     }
 
     return OperatorPrecedences.LOWEST;
-  }
-
-  Expression parseInfixExpression(Expression left) {
-    var t = curToken;
-    var p = curPrecedence();
-    nextToken();
-    var r = parseExpression(p);
-
-    return new InfixExpression(t, left, t.Literal, r);
   }
 
   public _Program ParseProgram() {
