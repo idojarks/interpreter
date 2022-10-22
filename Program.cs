@@ -2,7 +2,7 @@
 
 void TestIndentifierExpression() {
   var input = @"
-    add(2, 3*4, 5-6);
+    let f = add(2, 3*4, 5-6);
   ";
 
   var l = new Lexer(input);

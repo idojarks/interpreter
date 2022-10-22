@@ -122,16 +122,17 @@ public class Parser {
     }
 
     nextToken();
-    var num = curToken;
 
-    while (curToken.Type != Token.SEMICOLON) {
+    var e = parseExpression(OperatorPrecedences.LOWEST);
+
+    if (peekToken.Type == Token.SEMICOLON) {
       nextToken();
     }
 
     return new LetStatement(
       token,
       new Identifier(ident, ident.Literal),
-      new Identifier(num, num.Literal)
+      e
     );
   }
 
@@ -140,20 +141,13 @@ public class Parser {
 
     nextToken();
 
-    if (curToken.Type == Token.SEMICOLON) {
-      return new ReturnStatement(t, null);
-    }
+    var returnValue = parseExpression(OperatorPrecedences.LOWEST);
 
-    var num = curToken;
-
-    while (curToken.Type != Token.SEMICOLON) {
+    if (peekToken.Type == Token.SEMICOLON) {
       nextToken();
     }
 
-    return new ReturnStatement(
-      t,
-      new Identifier(num, num.Literal)
-    );
+    return new ReturnStatement(t, returnValue);
   }
 
   BlockStatement? parseBlockStatement() {
