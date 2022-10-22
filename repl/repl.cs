@@ -13,14 +13,20 @@ public class Repl {
       }
 
       var l = new Lexer(line);
+      var p = l.New();
+      var program = p.ParseProgram();
 
-      var token = l.NextToken();
+      var errors = p.Errors();
 
-      while (token.Type != Token.EOF) {
-        Console.WriteLine("type: {0}\tliteral: {1}", token.Type, token.Literal);
+      if (errors?.Count > 0) {
+        errors.ForEach(delegate(string s) {
+          System.Console.WriteLine(s);
+        });
 
-        token = l.NextToken();
+        return;
       }
+
+      System.Console.WriteLine(program.String());
     }
   }
 }

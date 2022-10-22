@@ -1,6 +1,6 @@
-﻿//new Repl().Start();
+﻿new Repl().Start();
 
-void TestIndentifierExpression() {
+/* void TestIndentifierExpression() {
   var input = @"
     let f = add(2, 3*4, 5-6);
   ";
@@ -18,7 +18,7 @@ void TestIndentifierExpression() {
   System.Console.WriteLine(program.String());
   System.Console.WriteLine(Token.EOF);
 }
-TestIndentifierExpression();
+TestIndentifierExpression(); */
 
 /*
 void TestLetStatements() {
