@@ -26,7 +26,9 @@ public class Repl {
         return;
       }
 
-      System.Console.WriteLine(program.String());
+      var e = Evaluator.Eval(program);
+
+      System.Console.WriteLine(e.Inspect());
     }
   }
 }

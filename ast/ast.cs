@@ -5,7 +5,7 @@ public abstract class Node {
     token = t;
   }
 
-  public string TokenLiteral() {
+  public virtual string TokenLiteral() {
     return token.Literal;
   }
 
@@ -60,7 +60,7 @@ public class ReturnStatement : Statement {
 }
 
 public class ExpressionStatement : Statement {
-  Expression? expression;
+  public Expression? expression;
 
   public ExpressionStatement(Token t, Expression? e=null) : base(t) {
     expression = e;
@@ -230,10 +230,12 @@ public class CallExpression : Expression {
   }
 }
 
-public class _Program {
+public class _Program : Node {
   public List<Statement> Statements = new();
 
-  public string TokenLiteral() {
+  public _Program() : base(new Token(Token.FUNCTION, "Program")) {}
+
+  public override string TokenLiteral() {
     if (Statements.Count > 0) {
       return Statements[0].TokenLiteral();
     }
@@ -242,7 +244,7 @@ public class _Program {
     }
   }
 
-  public string String() {
+  public override string String() {
     StringWriter writer = new ();
 
     foreach (var item in Statements)

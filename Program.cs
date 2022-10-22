@@ -1,5 +1,20 @@
 ﻿new Repl().Start();
 
+/* void TestEvalIntegerExpression() {
+  var input = @"
+    5
+  ";
+
+  var l = new Lexer(input);
+  var p = l.New();
+  var program = p.ParseProgram();
+
+  var v = Evaluator.Eval(program);
+  System.Console.WriteLine($"{v.Inspect()} {v.Type()}");
+}
+
+TestEvalIntegerExpression();
+ */
 /* void TestIndentifierExpression() {
   var input = @"
     let f = add(2, 3*4, 5-6);
