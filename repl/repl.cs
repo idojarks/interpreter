@@ -26,7 +26,8 @@ public class Repl {
         return;
       }
 
-      var e = Evaluator.Eval(program);
+      var eval = new Evaluator();
+      var e = eval.Eval(program);
 
       System.Console.WriteLine(e.Inspect());
     }

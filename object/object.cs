@@ -30,6 +30,10 @@ public class Integer : IObject {
 public class Bool : IObject {
   public bool _value;
 
+  public Bool(bool v) {
+    _value = v;
+  }
+
   public string Inspect() {
     return $"{_value.ToString()}";
   }
