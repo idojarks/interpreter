@@ -1,9 +1,14 @@
 ﻿//new Repl().Start();
 
 var input = @"
-    5*5;
-    return 3;
-    10*10;
+    5 + true;
+    -true;
+    true+false;
+    if (10>1) {
+      if (10>1) {
+        return true+false;
+      }
+    }
   ";
 
   var l = new Lexer(input);

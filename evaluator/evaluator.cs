@@ -29,6 +29,10 @@ public class Evaluator {
         else {
           var right = Eval(e.right);
 
+          if (isError(right)) {
+            return right;
+          }
+
           return evalPrefixExpression(e.op, right);
         }
       }
@@ -38,7 +42,16 @@ public class Evaluator {
         }
 
         var left = Eval(e.left);
+
+        if (isError(left)) {
+          return left;
+        }
+
         var right = Eval(e.right);
+
+        if (isError(right)) {
+          return right;
+        }
 
         return evalInfixExpression(e.op, left, right);
       }
@@ -50,6 +63,10 @@ public class Evaluator {
         }
         else {
           var v = Eval(s.returnValue);
+
+          if (isError(v)) {
+            return v;
+          }
 
           return new ReturnValue(v);
         }
@@ -71,16 +88,31 @@ public class Evaluator {
       if (result is ReturnValue r) {
         return r.value;
       }
+      else if (result is Error e) {
+        return e;
+      }
     }
 
     return result;
+  }
+
+  Error newError(string s) {
+    return new Error(s);
+  }
+
+  bool isError(IObject obj) {
+    if (obj != Objects.nullObj) {
+      return obj.Type() == IObject.ERROR_OBJ;
+    }
+
+    return false;
   }
 
   IObject evalPrefixExpression(string op, IObject right) {
     return op switch {
       "!" => evalBangOperatorExpression(right),
       "-" => evalMinusPrefixOperatorExpression(right),
-      _ => Objects.nullObj,
+      _ => newError($"unknown operator: {op} {right.Type()}"),
     };
   }
 
@@ -98,7 +130,7 @@ public class Evaluator {
       return new Integer(-i.value);
     }
     else {
-      return Objects.nullObj;
+      return newError($"unknown operator: -{right.Type()}");
     }
   }
 
@@ -106,13 +138,16 @@ public class Evaluator {
     if ((left is Integer l) && (right is Integer r)) {
       return evalIntegerInfixExpression(op, l, r);
     }
+    else if (left.Type() != right.Type()) {
+      return newError($"type mismatch: {left.Type()} {op} {right.Type()}");
+    }
     else {
       return op switch {
         "==" when left == right => Objects.trueObj,
         "==" when left != right => Objects.falseObj,
         "!=" when left != right => Objects.trueObj,
         "!=" when left == right => Objects.falseObj,
-        _ => Objects.nullObj,
+        _ => newError($"unknown operator: {left.Type()} {op} {right.Type()}"),
       };
     }
   }
@@ -124,8 +159,12 @@ public class Evaluator {
     {
       result = Eval(s);
 
-      if (result != Objects.nullObj && result.Type() == IObject.NULL_OBJ) {
-        return result;
+      if (result != Objects.nullObj) {
+        var rt = result.Type();
+
+        if (rt == IObject.NULL_OBJ || rt == IObject.ERROR_OBJ) {
+          return result;
+        }
       }
     }
 
@@ -142,6 +181,10 @@ public class Evaluator {
     }
 
     var condition = Eval(e.condition);
+
+    if (isError(condition)) {
+      return condition;
+    }
 
     if (isTruthy(condition)) {
       return Eval(e.consequence);
@@ -168,7 +211,7 @@ public class Evaluator {
       "==" when left.value != right.value => Objects.falseObj,
       "!=" when left.value != right.value => Objects.trueObj,
       "!=" when left.value == right.value => Objects.falseObj,
-      _ => Objects.nullObj,
+      _ => newError($"unknown operator: {left.Type()} {op} {right.Type()}"),
     };
   }
 }

@@ -8,6 +8,7 @@ public interface IObject {
   const string BOOLEAN_OBJ = "BOOLEAN";
   const string NULL_OBJ = "NULL";
   const string RETURN_VALUE_OBJ = "RETURN_VALUE";
+  const string ERROR_OBJ = "ERROR";
 }
 
 public class Objects {
@@ -71,5 +72,21 @@ public class ReturnValue : IObject {
 
   public string Inspect() {
     return value.Inspect();
+  }
+}
+
+public class Error : IObject {
+  public string message = "";
+
+  public Error(string s) {
+    message = s;
+  }
+
+  public ObjectType Type() {
+    return IObject.ERROR_OBJ;
+  }
+
+  public string Inspect() {
+    return $"ERROR: {message}";
   }
 }
