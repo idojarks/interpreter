@@ -156,9 +156,9 @@ public class Boolean : Expression {
 }
 
 public class IfExpression : Expression {
-  Expression condition;
-  BlockStatement consequence;
-  BlockStatement? alternative;
+  public Expression condition;
+  public BlockStatement consequence;
+  public BlockStatement? alternative;
 
   public IfExpression(Token t, Expression cd, BlockStatement c, BlockStatement? a=null) : base(t) {
     condition = cd;

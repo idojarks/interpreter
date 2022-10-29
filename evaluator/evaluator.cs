@@ -1,28 +1,12 @@
 public class Evaluator {
-  Bool trueObj = new Bool(true);
-  Bool falseObj = new Bool(false);
-  Null nullObj = new Null();
-
   public IObject Eval(Node node) {
     switch (node) {
       case _Program p: {
-        IObject? result = null;
-
-        foreach (var s in p.Statements)
-        {
-          result = Eval(s);
-        }
-
-        if (result == null) {
-          return nullObj;
-        }
-        else {
-          return result;
-        }
+        return evalProgram(p);
       }
       case ExpressionStatement es: {
         if (es.expression == null) {
-          return nullObj;
+          return Objects.nullObj;
         }
         else {
           return Eval(es.expression);
@@ -32,15 +16,15 @@ public class Evaluator {
         return new Integer(il.value);
       case Boolean b: {
         if (b.value) {
-          return trueObj;
+          return Objects.trueObj;
         }
         else {
-          return falseObj;
+          return Objects.falseObj;
         }
       }
       case PrefixExpression e: {
         if (e.right == null) {
-          return nullObj;
+          return Objects.nullObj;
         }
         else {
           var right = Eval(e.right);
@@ -50,7 +34,7 @@ public class Evaluator {
       }
       case InfixExpression e: {
         if (e.right == null) {
-          return nullObj;
+          return Objects.nullObj;
         }
 
         var left = Eval(e.left);
@@ -58,25 +42,54 @@ public class Evaluator {
 
         return evalInfixExpression(e.op, left, right);
       }
+      case BlockStatement s:
+        return evalBlockStatments(s);
+      case ReturnStatement s: {
+        if (s.returnValue == null) {
+          return Objects.nullObj;
+        }
+        else {
+          var v = Eval(s.returnValue);
+
+          return new ReturnValue(v);
+        }
+      }
+      case IfExpression e:
+        return evalIfExpression(e);
       default:
-        return nullObj;
+        return Objects.nullObj;
     }
+  }
+
+  IObject evalProgram(_Program p) {
+    IObject result = Objects.nullObj;
+
+    foreach (var s in p.Statements)
+    {
+      result = Eval(s);
+
+      if (result is ReturnValue r) {
+        return r.value;
+      }
+    }
+
+    return result;
   }
 
   IObject evalPrefixExpression(string op, IObject right) {
     return op switch {
       "!" => evalBangOperatorExpression(right),
       "-" => evalMinusPrefixOperatorExpression(right),
-      _ => nullObj,
+      _ => Objects.nullObj,
     };
   }
 
   IObject evalBangOperatorExpression(IObject right) {
     return right switch {
-      Bool b when b._value == true => falseObj,
-      Bool b when b._value == false => trueObj,
-      Null => trueObj,
-      _ => falseObj,
+      Bool b when b._value == true => Objects.falseObj,
+      Bool b when b._value == false => Objects.trueObj,
+      Null => Objects.trueObj,
+      _ => Objects.falseObj,
     };
   }
 
@@ -85,7 +98,7 @@ public class Evaluator {
       return new Integer(-i.value);
     }
     else {
-      return nullObj;
+      return Objects.nullObj;
     }
   }
 
@@ -95,12 +108,49 @@ public class Evaluator {
     }
     else {
       return op switch {
-        "==" when left == right => trueObj,
-        "==" when left != right => falseObj,
-        "!=" when left != right => trueObj,
-        "!=" when left == right => falseObj,
-        _ => nullObj,
+        "==" when left == right => Objects.trueObj,
+        "==" when left != right => Objects.falseObj,
+        "!=" when left != right => Objects.trueObj,
+        "!=" when left == right => Objects.falseObj,
+        _ => Objects.nullObj,
       };
+    }
+  }
+
+  IObject evalBlockStatments(BlockStatement bs) {
+    IObject result = Objects.nullObj;
+
+    foreach (var s in bs.statements)
+    {
+      result = Eval(s);
+
+      if (result != Objects.nullObj && result.Type() == IObject.NULL_OBJ) {
+        return result;
+      }
+    }
+
+    return result;
+  }
+
+  IObject evalIfExpression(IfExpression e) {
+    bool isTruthy(IObject obj) {
+      return obj switch {
+        Null => false,
+        Bool when obj == Objects.falseObj => false,
+        _ => true,
+      };
+    }
+
+    var condition = Eval(e.condition);
+
+    if (isTruthy(condition)) {
+      return Eval(e.consequence);
+    }
+    else if (e.alternative != null) {
+      return Eval(e.alternative);
+    }
+    else {
+      return Objects.nullObj;
     }
   }
 
@@ -110,15 +160,15 @@ public class Evaluator {
       "-" => new Integer(left.value - right.value),
       "*" => new Integer(left.value * right.value),
       "/" => new Integer(left.value / right.value),
-      "<" when left.value < right.value => trueObj,
-      "<" when left.value >= right.value => falseObj,
-      ">" when left.value > right.value => trueObj,
-      ">" when left.value <= right.value => falseObj,
-      "==" when left.value == right.value => trueObj,
-      "==" when left.value != right.value => falseObj,
-      "!=" when left.value != right.value => trueObj,
-      "!=" when left.value == right.value => falseObj,
-      _ => nullObj,
+      "<" when left.value < right.value => Objects.trueObj,
+      "<" when left.value >= right.value => Objects.falseObj,
+      ">" when left.value > right.value => Objects.trueObj,
+      ">" when left.value <= right.value => Objects.falseObj,
+      "==" when left.value == right.value => Objects.trueObj,
+      "==" when left.value != right.value => Objects.falseObj,
+      "!=" when left.value != right.value => Objects.trueObj,
+      "!=" when left.value == right.value => Objects.falseObj,
+      _ => Objects.nullObj,
     };
   }
 }

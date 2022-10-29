@@ -1,15 +1,20 @@
 global using ObjectType = System.String;
 
- public interface IObject {
+public interface IObject {
   ObjectType Type();
   string Inspect();
 
   const string INTEGER_OBJ = "INTEGER";
   const string BOOLEAN_OBJ = "BOOLEAN";
   const string NULL_OBJ = "NULL";
+  const string RETURN_VALUE_OBJ = "RETURN_VALUE";
 }
 
-
+public class Objects {
+  public static Bool trueObj = new Bool(true);
+  public static Bool falseObj = new Bool(false);
+  public static Null nullObj = new Null();
+}
 
 public class Integer : IObject {
   public Int64 value;
@@ -50,5 +55,21 @@ public class Null : IObject {
 
   public ObjectType Type() {
     return IObject.NULL_OBJ;
+  }
+}
+
+public class ReturnValue : IObject {
+  public IObject value = Objects.nullObj;
+
+  public ReturnValue(IObject v) {
+    value = v;
+  }
+
+  public ObjectType Type() {
+    return IObject.RETURN_VALUE_OBJ;
+  }
+
+  public string Inspect() {
+    return value.Inspect();
   }
 }
