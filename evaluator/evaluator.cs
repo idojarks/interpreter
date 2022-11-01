@@ -1,15 +1,15 @@
 public class Evaluator {
-  public IObject Eval(Node node) {
+  public IObject Eval(Node node, Environment env) {
     switch (node) {
       case _Program p: {
-        return evalProgram(p);
+        return evalProgram(p, env);
       }
       case ExpressionStatement es: {
         if (es.expression == null) {
           return Objects.nullObj;
         }
         else {
-          return Eval(es.expression);
+          return Eval(es.expression, env);
         }
       }
       case IntegerLiteral il:
@@ -27,7 +27,7 @@ public class Evaluator {
           return Objects.nullObj;
         }
         else {
-          var right = Eval(e.right);
+          var right = Eval(e.right, env);
 
           if (isError(right)) {
             return right;
@@ -41,13 +41,13 @@ public class Evaluator {
           return Objects.nullObj;
         }
 
-        var left = Eval(e.left);
+        var left = Eval(e.left, env);
 
         if (isError(left)) {
           return left;
         }
 
-        var right = Eval(e.right);
+        var right = Eval(e.right, env);
 
         if (isError(right)) {
           return right;
@@ -56,13 +56,13 @@ public class Evaluator {
         return evalInfixExpression(e.op, left, right);
       }
       case BlockStatement s:
-        return evalBlockStatments(s);
+        return evalBlockStatments(s, env);
       case ReturnStatement s: {
         if (s.returnValue == null) {
           return Objects.nullObj;
         }
         else {
-          var v = Eval(s.returnValue);
+          var v = Eval(s.returnValue, env);
 
           if (isError(v)) {
             return v;
@@ -72,18 +72,35 @@ public class Evaluator {
         }
       }
       case IfExpression e:
-        return evalIfExpression(e);
+        return evalIfExpression(e, env);
+      case LetStatement s: {
+        if (s.value == null) {
+          return newError($"let statement has no value: {s.name}");
+        }
+
+        var val = Eval(s.value, env);
+
+        if (isError(val)) {
+          return val;
+        }
+
+        env.Set(s.name.value, val);
+
+        return val;
+      }
+      case Identifier i:
+        return evalIdentifier(i, env);
       default:
         return Objects.nullObj;
     }
   }
 
-  IObject evalProgram(_Program p) {
+  IObject evalProgram(_Program p, Environment env) {
     IObject result = Objects.nullObj;
 
     foreach (var s in p.Statements)
     {
-      result = Eval(s);
+      result = Eval(s, env);
 
       if (result is ReturnValue r) {
         return r.value;
@@ -152,12 +169,12 @@ public class Evaluator {
     }
   }
 
-  IObject evalBlockStatments(BlockStatement bs) {
+  IObject evalBlockStatments(BlockStatement bs, Environment env) {
     IObject result = Objects.nullObj;
 
     foreach (var s in bs.statements)
     {
-      result = Eval(s);
+      result = Eval(s, env);
 
       if (result != Objects.nullObj) {
         var rt = result.Type();
@@ -171,7 +188,7 @@ public class Evaluator {
     return result;
   }
 
-  IObject evalIfExpression(IfExpression e) {
+  IObject evalIfExpression(IfExpression e, Environment env) {
     bool isTruthy(IObject obj) {
       return obj switch {
         Null => false,
@@ -180,21 +197,31 @@ public class Evaluator {
       };
     }
 
-    var condition = Eval(e.condition);
+    var condition = Eval(e.condition, env);
 
     if (isError(condition)) {
       return condition;
     }
 
     if (isTruthy(condition)) {
-      return Eval(e.consequence);
+      return Eval(e.consequence, env);
     }
     else if (e.alternative != null) {
-      return Eval(e.alternative);
+      return Eval(e.alternative, env);
     }
     else {
       return Objects.nullObj;
     }
+  }
+
+  IObject evalIdentifier(Identifier node, Environment env) {
+    var val = env.Get(node.value);
+
+    if (val == null) {
+      return newError($"identifier not found: {node.value}");
+    }
+
+    return val;
   }
 
   IObject evalIntegerInfixExpression(string op, Integer left, Integer right) {

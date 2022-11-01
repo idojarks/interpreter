@@ -27,7 +27,8 @@ public class Repl {
       }
 
       var eval = new Evaluator();
-      var e = eval.Eval(program);
+      var env = new Environment();
+      var e = eval.Eval(program, env);
 
       System.Console.WriteLine(e.Inspect());
     }
