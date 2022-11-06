@@ -7,6 +7,7 @@ public class Token
 
   public const string IDENT = "IDENT";
   public const string INT = "INT";
+  public const string STRING = "STRING";
 
   public const string ASSIGN = "=";
   public const string PLUS = "+";

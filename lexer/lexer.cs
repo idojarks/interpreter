@@ -71,6 +71,20 @@ public class Lexer {
     }
   }
 
+  string readString() {
+    var startPos = position + 1;
+
+    while (true) {
+      readChar();
+
+      if (ch == '"' || ch == 0) {
+        break;
+      }
+    }
+
+    return input.Substring(startPos, position - startPos);
+  }
+
   char peekChar() {
     if (readPosition >= input.Length)
     {
@@ -88,6 +102,11 @@ public class Lexer {
     skipWhiteSpace();
 
     switch (ch) {
+      case '"':
+        {
+          tok = new Token(Token.STRING, readString());
+        }
+        break;
       case '=':
         if (peekChar() == '=')
         {

@@ -1,4 +1,5 @@
 global using ObjectType = System.String;
+using System.Text;
 
 public interface IObject {
   ObjectType Type();
@@ -9,6 +10,8 @@ public interface IObject {
   const string NULL_OBJ = "NULL";
   const string RETURN_VALUE_OBJ = "RETURN_VALUE";
   const string ERROR_OBJ = "ERROR";
+  const string FUNCTION_OBJ = "FUNCTION";
+  const string STRING_OBJ = "STRING";
 }
 
 public class Objects {
@@ -33,15 +36,31 @@ public class Integer : IObject {
   } 
 }
 
-public class Bool : IObject {
-  public bool _value;
+public class StringObj : IObject {
+  public string value;
 
-  public Bool(bool v) {
-    _value = v;
+  public StringObj(string s) {
+    value = s;
   }
 
   public string Inspect() {
-    return $"{_value.ToString()}";
+    return value;
+  }
+
+  public ObjectType Type() {
+    return IObject.STRING_OBJ;
+  } 
+}
+
+public class Bool : IObject {
+  public bool value;
+
+  public Bool(bool v) {
+    value = v;
+  }
+
+  public string Inspect() {
+    return $"{value.ToString()}";
   }
 
   public ObjectType Type() {
@@ -88,5 +107,40 @@ public class Error : IObject {
 
   public string Inspect() {
     return $"ERROR: {message}";
+  }
+}
+
+public class Function : IObject {
+  public List<Identifier>? parameters = null;
+  public BlockStatement? body = null;
+  public Environment env;
+
+  public Function(List<Identifier>? p, BlockStatement? b, Environment e) {
+    parameters = p;
+    body = b;
+    env = e;
+  }
+
+  public ObjectType Type() {
+    return IObject.FUNCTION_OBJ;
+  }
+
+  public string Inspect() {
+    var sb = new StringBuilder();
+
+    if (parameters != null) {
+      foreach (var item in parameters)
+      {
+        sb.Append(item.String());
+      }
+    }
+
+    var bodyString = "{}";
+
+    if (body?.statements.Count > 0) {
+      bodyString = $"{{\n{body?.String()}\n}}";
+    }
+
+    return $"fn ({String.Join(", ", sb.ToString())}) {bodyString}";
   }
 }

@@ -50,6 +50,7 @@ public class Parser {
     registerPrefix(Token.LPAREN, parseGroupedExpression);
     registerPrefix(Token.IF, parseIfExpression);
     registerPrefix(Token.FUNCTION, parseFunctionLiteral);
+    registerPrefix(Token.STRING, parseStringLiteral);
     
     registerInfix(Token.PLUS, parseInfixExpression);
     registerInfix(Token.MINUS, parseInfixExpression);
@@ -294,6 +295,10 @@ public class Parser {
     fl.body = parseBlockStatement();
 
     return fl;
+  }
+
+  Expression parseStringLiteral() {
+    return new StringLiteral(curToken.Literal);
   }
 
   List<Identifier>? parseFunctionParameters() {

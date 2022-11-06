@@ -1,6 +1,27 @@
 public class Evaluator {
   public IObject Eval(Node node, Environment env) {
     switch (node) {
+      case StringLiteral _node: {
+        return new StringObj(_node.value);
+      }
+      case CallExpression _node: {
+        var function = Eval(_node.function, env);
+
+        if (isError(function)) {
+          return function;
+        }
+
+        var args = evalExpressions(_node.arguments, env);
+
+        if (args.Count == 1 && isError(args[0])) {
+          return args[0];
+        }
+
+        return applyFunction(function, args);
+      }
+      case FunctionLiteral f: {
+        return new Function(f.parameters, f.body, env);
+      }
       case _Program p: {
         return evalProgram(p, env);
       }
@@ -95,6 +116,70 @@ public class Evaluator {
     }
   }
 
+  IObject applyFunction(IObject fn, List<IObject> args) {
+    if (fn is Function f) {
+      if (f.body == null) {
+        return Objects.nullObj;
+      }
+
+      var extendedEnv = extendFunctionEnv(f, args); 
+      var evaluated = Eval(f.body, extendedEnv);
+      
+      return unwrapReturnValue(evaluated);
+    }
+    else {
+      return newError($"not a function: {fn.Type()}");
+    }
+  }
+
+  IObject unwrapReturnValue(IObject obj) {
+    if (obj is ReturnValue r) {
+      return r.value;
+    }
+    else {
+      return obj;
+    }
+  }
+
+  Environment extendFunctionEnv(Function fn, List<IObject> args) {
+    var env = Environment.NewEnclosedEnvironment(fn.env);
+
+    if (fn.parameters == null) {
+      return env;
+    }
+
+    for (int i = 0; i < fn.parameters.Count; i++)
+    {
+      var p = fn.parameters[i];
+
+      env.Set(p.value, args[i]);
+    }
+
+    return env;
+  }
+
+  List<IObject> evalExpressions(List<Expression>? exps, Environment env) {
+    var list = new List<IObject>();
+
+    if (exps == null) {
+      return list;
+    }
+
+    foreach (var item in exps)
+    {
+      var evaluated = Eval(item, env);
+
+      if (isError(evaluated)) {
+        IObject[] temp = {evaluated};
+        return new List<IObject>(temp);
+      }
+
+      list.Add(evaluated);
+    }
+
+    return list;
+  }
+
   IObject evalProgram(_Program p, Environment env) {
     IObject result = Objects.nullObj;
 
@@ -135,8 +220,8 @@ public class Evaluator {
 
   IObject evalBangOperatorExpression(IObject right) {
     return right switch {
-      Bool b when b._value == true => Objects.falseObj,
-      Bool b when b._value == false => Objects.trueObj,
+      Bool b when b.value == true => Objects.falseObj,
+      Bool b when b.value == false => Objects.trueObj,
       Null => Objects.trueObj,
       _ => Objects.falseObj,
     };
@@ -214,7 +299,7 @@ public class Evaluator {
     }
   }
 
-  IObject evalIdentifier(Identifier node, Environment env) {
+  IObject  evalIdentifier(Identifier node, Environment env) {
     var val = env.Get(node.value);
 
     if (val == null) {

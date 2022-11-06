@@ -255,3 +255,16 @@ public class _Program : Node {
     return writer.ToString();
   }
 }
+
+public class StringLiteral : Expression {
+  public string value;
+
+  public StringLiteral(string v) : base(new Token(Token.STRING, v)) {
+    value = v;
+  }
+
+  public override string String()
+  {
+    return token.Literal;
+  }
+}
