@@ -1,7 +1,7 @@
 ﻿//new Repl().Start();
 
 var input = @"
-    ""foo"";
+    ""hello""+"" ""+""world!"";
   ";
 
 var l = new Lexer(input);

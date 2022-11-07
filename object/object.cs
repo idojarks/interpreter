@@ -12,6 +12,7 @@ public interface IObject {
   const string ERROR_OBJ = "ERROR";
   const string FUNCTION_OBJ = "FUNCTION";
   const string STRING_OBJ = "STRING";
+  const string BUILTIN_OBJ = "BUILTIN";
 }
 
 public class Objects {
@@ -142,5 +143,15 @@ public class Function : IObject {
     }
 
     return $"fn ({String.Join(", ", sb.ToString())}) {bodyString}";
+  }
+}
+
+public class BuiltinFunction : IObject {
+  public ObjectType Type() {
+    return IObject.BUILTIN_OBJ;
+  }
+
+  public string Inspect() {
+    return "builtin function";
   }
 }

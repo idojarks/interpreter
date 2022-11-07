@@ -240,6 +240,9 @@ public class Evaluator {
     if ((left is Integer l) && (right is Integer r)) {
       return evalIntegerInfixExpression(op, l, r);
     }
+    else if ((left is StringObj leftString) && (right is StringObj rightString)) {
+      return evalStringInfixExpression(op, leftString, rightString);
+    }
     else if (left.Type() != right.Type()) {
       return newError($"type mismatch: {left.Type()} {op} {right.Type()}");
     }
@@ -323,6 +326,13 @@ public class Evaluator {
       "==" when left.value != right.value => Objects.falseObj,
       "!=" when left.value != right.value => Objects.trueObj,
       "!=" when left.value == right.value => Objects.falseObj,
+      _ => newError($"unknown operator: {left.Type()} {op} {right.Type()}"),
+    };
+  }
+
+  IObject evalStringInfixExpression(string op, StringObj left, StringObj right) {
+    return op switch {
+      "+" => new StringObj(left.value + right.value),
       _ => newError($"unknown operator: {left.Type()} {op} {right.Type()}"),
     };
   }
