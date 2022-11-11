@@ -146,7 +146,14 @@ public class Function : IObject {
   }
 }
 
-public class BuiltinFunction : IObject {
+public class Builtin : IObject {
+  public delegate IObject BuiltinFunction(params IObject[] args);
+  public BuiltinFunction fn;
+
+  public Builtin(BuiltinFunction f) {
+    fn = f;
+  }
+
   public ObjectType Type() {
     return IObject.BUILTIN_OBJ;
   }

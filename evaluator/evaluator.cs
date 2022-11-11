@@ -1,4 +1,10 @@
 public class Evaluator {
+  Builtins builtins;
+
+  public Evaluator() {
+    builtins = new Builtins();
+  }
+
   public IObject Eval(Node node, Environment env) {
     switch (node) {
       case StringLiteral _node: {
@@ -126,6 +132,9 @@ public class Evaluator {
       var evaluated = Eval(f.body, extendedEnv);
       
       return unwrapReturnValue(evaluated);
+    }
+    else if (fn is Builtin b) {
+      return b.fn(args.ToArray());
     }
     else {
       return newError($"not a function: {fn.Type()}");
@@ -302,10 +311,14 @@ public class Evaluator {
     }
   }
 
-  IObject  evalIdentifier(Identifier node, Environment env) {
+  IObject evalIdentifier(Identifier node, Environment env) {
     var val = env.Get(node.value);
 
     if (val == null) {
+      if (builtins.store.TryGetValue(node.value, out var builtin)) {
+        return builtin;
+      }
+      
       return newError($"identifier not found: {node.value}");
     }
 
