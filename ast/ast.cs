@@ -1,3 +1,5 @@
+using System.Text;
+
 public abstract class Node {
   public Token token;
 
@@ -25,11 +27,15 @@ public abstract class Expression : Node {
 }
 
 public class InvalidExpression : Expression {
-  public InvalidExpression() : base(new Token(Token.ILLEGAL, Token.ILLEGAL)) {}
+  string errorMsg;
+
+  public InvalidExpression(string s) : base(new Token(Token.ILLEGAL, Token.ILLEGAL)) {
+    errorMsg = s;
+  }
 
   public override string String()
   {
-    return token.Literal;
+    return $"{TokenLiteral} : {errorMsg}";
   }
 }
 
@@ -266,5 +272,49 @@ public class StringLiteral : Expression {
   public override string String()
   {
     return token.Literal;
+  }
+}
+
+public class ArrayLiteral : Expression {
+  public List<Expression>? elements = null;
+
+  public ArrayLiteral() : base(new Token(Token.LBRACKET, "[")) {
+  }
+
+  public override string String()
+  {
+    StringBuilder sb = new();
+
+    sb.Append("[");
+
+    if (elements != null) {
+      for (int i = 0; i < elements.Count; i++)
+      {
+        sb.Append(elements[i].String());
+
+        if (i + 1 < elements.Count) {
+          sb.Append(", ");
+        }
+      }
+    }
+
+    sb.Append("]");
+
+    return sb.ToString();
+  }
+}
+
+public class IndexExpression : Expression {
+  public Expression left;
+  public Expression index;
+
+  public IndexExpression(Expression l, Expression i) : base(new Token(Token.IDENT, "index expression")) {
+    left = l;
+    index = i;
+  }
+
+  public override string String()
+  {
+    return $"({left.String()}[{index.String()}])";
   }
 }

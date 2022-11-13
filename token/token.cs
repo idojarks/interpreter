@@ -26,6 +26,8 @@ public class Token
   public const string RPAREN = ")";
   public const string LBRACE = "{";
   public const string RBRACE = "}";
+  public const string LBRACKET = "[";
+  public const string RBRACKET = "]";
 
   public const string FUNCTION = "FUNCTION";
   public const string LET = "LET";
@@ -37,6 +39,7 @@ public class Token
 
   public const string EQ = "==";
   public const string NOT_EQ = "!=";
+
 
   static Dictionary<string, TokenType> keywords = new();
   

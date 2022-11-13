@@ -13,6 +13,7 @@ public interface IObject {
   const string FUNCTION_OBJ = "FUNCTION";
   const string STRING_OBJ = "STRING";
   const string BUILTIN_OBJ = "BUILTIN";
+  const string ARRAY_OBJ = "ARRAY";
 }
 
 public class Objects {
@@ -160,5 +161,36 @@ public class Builtin : IObject {
 
   public string Inspect() {
     return "builtin function";
+  }
+}
+
+public class ArrayObj : IObject {
+  public List<IObject> elements;
+
+  public ArrayObj(List<IObject> e) {
+    elements = e;
+  }
+
+  public ObjectType Type() {
+    return IObject.ARRAY_OBJ;
+  }
+
+  public string Inspect() {
+    StringBuilder sb = new();
+
+    sb.Append("[");
+
+    for (int i = 0; i < elements.Count; i++)
+    {
+      sb.Append(elements[i].Inspect());
+
+      if (i + 1 < elements.Count) {
+        sb.Append(", ");
+      }
+    }
+
+    sb.Append("]");
+
+    return sb.ToString();
   }
 }

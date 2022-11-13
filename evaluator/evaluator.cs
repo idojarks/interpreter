@@ -7,6 +7,37 @@ public class Evaluator {
 
   public IObject Eval(Node node, Environment env) {
     switch (node) {
+      case IndexExpression _node: {
+        var left = Eval(_node.left, env);
+
+        if (isError(left)) {
+          return left;
+        }
+
+        var index = Eval(_node.index, env);
+
+        if (isError(index)) {
+          return index;
+        }
+
+        return evalIndexExpression(left, index);
+      }
+
+      case ArrayLiteral _node: {
+        if (_node.elements == null) {
+          return Objects.nullObj;
+        }
+
+        var elements = evalExpressions(_node.elements, env);
+
+        if (elements.Count == 1 && isError(elements[0])) {
+          return elements[0];
+        }
+
+        var ar = new ArrayObj(elements);
+
+        return ar;
+      }
       case StringLiteral _node: {
         return new StringObj(_node.value);
       }
@@ -167,6 +198,17 @@ public class Evaluator {
     return env;
   }
 
+  IObject evalIndexExpression(IObject left, IObject index) {
+    return left switch {
+      ArrayObj ar => index switch {
+        Integer i when (0 <= i.value && i.value < ar.elements.Count) => ar.elements[Convert.ToInt32(i.value)],
+        Integer i => newError($"evalIndexExpression() : out of bound. array count = {ar.elements.Count}, index = {i.value}"),
+        _ => newError($"evalIndexExpression() : not supported index type"),
+      },
+      _ => newError($"evalIndexExpression() : {left} is not ArrayObj")
+    };
+  }
+
   List<IObject> evalExpressions(List<Expression>? exps, Environment env) {
     var list = new List<IObject>();
 
@@ -180,6 +222,7 @@ public class Evaluator {
 
       if (isError(evaluated)) {
         IObject[] temp = {evaluated};
+
         return new List<IObject>(temp);
       }
 

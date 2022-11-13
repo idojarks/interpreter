@@ -19,6 +19,7 @@ public class Parser {
     {Token.SLASH, OperatorPrecedences.PRODUCT},
     {Token.ASTERISK, OperatorPrecedences.PRODUCT},
     {Token.LPAREN, OperatorPrecedences.CALL},
+    {Token.LBRACKET, OperatorPrecedences.INDEX}
   };
 
   enum OperatorPrecedences
@@ -30,6 +31,7 @@ public class Parser {
     PRODUCT,
     PREFIX,
     CALL,
+    INDEX,
   }
 
   public delegate Expression prefixParseFn();
@@ -51,6 +53,7 @@ public class Parser {
     registerPrefix(Token.IF, parseIfExpression);
     registerPrefix(Token.FUNCTION, parseFunctionLiteral);
     registerPrefix(Token.STRING, parseStringLiteral);
+    registerPrefix(Token.LBRACKET, parseArrayLiteral);
     
     registerInfix(Token.PLUS, parseInfixExpression);
     registerInfix(Token.MINUS, parseInfixExpression);
@@ -61,6 +64,7 @@ public class Parser {
     registerInfix(Token.LT, parseInfixExpression);
     registerInfix(Token.GT, parseInfixExpression);
     registerInfix(Token.LPAREN, parseCallExpression);
+    registerInfix(Token.LBRACKET, parseIndexExpression);
   }
 
   public List<string> Errors() {
@@ -183,7 +187,7 @@ public class Parser {
     if (!prefixParseFns.TryGetValue(curToken.Type, out var prefix)) {
       errors.Add($"no prefix parse function for {curToken.Type} found");
 
-      return new InvalidExpression();
+      return new InvalidExpression($"parseExpression() : no prefix parse function for {curToken.Type} found");
     }
 
     var leftExp = prefix();
@@ -231,7 +235,7 @@ public class Parser {
     var expr = parseExpression(OperatorPrecedences.LOWEST);
 
     if (!expectPeek(Token.RPAREN)) {
-      return new InvalidExpression();
+      return new InvalidExpression($"parseGroupedExpression() : {expr}");
     }
 
     return expr;
@@ -241,7 +245,7 @@ public class Parser {
     var tokenIf = curToken;
 
     if (!expectPeek(Token.LPAREN)) {
-      return new InvalidExpression();
+      return new InvalidExpression($"parseIfExpression() : expected (");
     }
     
     nextToken();
@@ -249,11 +253,11 @@ public class Parser {
     var condition = parseExpression(OperatorPrecedences.LOWEST);
 
     if (!expectPeek(Token.RPAREN)) {
-      return new InvalidExpression();
+      return new InvalidExpression($"parseIfExpression() : expected )");
     }
 
     if (!expectPeek(Token.LBRACE)) {
-      return new InvalidExpression();
+      return new InvalidExpression($"parseIfExpression() : expected {{");
     }
 
     var consequence = parseBlockStatement();
@@ -264,14 +268,14 @@ public class Parser {
       nextToken();
 
       if (!expectPeek(Token.LBRACE)) {
-        return new InvalidExpression();
+        return new InvalidExpression($"parseIfExpression() : expected }}");
       }
 
       alternative = parseBlockStatement();
     }
 
     return (consequence == null) 
-      ? new InvalidExpression()
+      ? new InvalidExpression($"parseIfExpression() : no consequence")
       : new IfExpression(tokenIf, condition, consequence, alternative);
   }
 
@@ -279,17 +283,17 @@ public class Parser {
     var fl = new FunctionLiteral(curToken);
 
     if (!expectPeek(Token.LPAREN)) {
-      return new InvalidExpression();
+      return new InvalidExpression($"parseFunctionLiteral() : expected (");
     }
 
     fl.parameters = parseFunctionParameters();
 
     if (fl.parameters == null) {
-      return new InvalidExpression();
+      return new InvalidExpression($"parseFunctionLiteral() : invalid parameters");
     }
 
     if (!expectPeek(Token.LBRACE)) {
-      return new InvalidExpression();
+      return new InvalidExpression($"parseFunctionLiteral() : expected {{");
     }
 
     fl.body = parseBlockStatement();
@@ -299,6 +303,51 @@ public class Parser {
 
   Expression parseStringLiteral() {
     return new StringLiteral(curToken.Literal);
+  }
+
+  Expression parseArrayLiteral() {
+    var ar = new ArrayLiteral();
+
+    ar.elements = parseExpressionList(Token.RBRACKET);
+
+    return ar;
+  }
+
+  Expression parseIndexExpression(Expression left) {
+    nextToken();
+
+    var index = parseExpression(OperatorPrecedences.LOWEST);
+
+    if (!expectPeek(Token.RBRACKET)) {
+      return new InvalidExpression($"parseIndexExpression() : expected ]");
+    }
+
+    return new IndexExpression(left, index);
+  }
+
+  List<Expression>? parseExpressionList(TokenType end) {
+    if (peekToken.Type == end) {
+      return null;
+    }
+
+    nextToken();
+
+    List<Expression> elements = new();
+
+    elements.Add(parseExpression(OperatorPrecedences.LOWEST));
+
+    while (peekToken.Type == Token.COMMA) {
+      nextToken();
+      nextToken();
+
+      elements.Add(parseExpression(OperatorPrecedences.LOWEST));
+    }
+
+    if (!expectPeek(Token.RBRACKET)) {
+      return null;
+    }
+
+    return elements;
   }
 
   List<Identifier>? parseFunctionParameters() {
@@ -338,36 +387,9 @@ public class Parser {
   Expression parseCallExpression(Expression function) {
     var ce = new CallExpression(curToken, function);
     
-    ce.arguments = parseCallArguments();
+    ce.arguments = parseExpressionList(Token.RPAREN);
 
     return ce;
-  }
-
-  List<Expression>? parseCallArguments() {
-    List<Expression> args = new();
-
-    if (peekToken.Type == Token.RPAREN) {
-      nextToken();
-
-      return args;
-    }
-
-    nextToken();
-
-    args.Add(parseExpression(OperatorPrecedences.LOWEST));
-
-    while (peekToken.Type == Token.COMMA) {
-      nextToken();
-      nextToken();
-
-      args.Add(parseExpression(OperatorPrecedences.LOWEST));
-    }
-
-    if (!expectPeek(Token.RPAREN)) {
-      return null;
-    }
-
-    return args;
   }
 
   OperatorPrecedences peekPrecedence() {

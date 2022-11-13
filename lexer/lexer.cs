@@ -102,6 +102,16 @@ public class Lexer {
     skipWhiteSpace();
 
     switch (ch) {
+      case '[': {
+        tok = newToken(Token.LBRACKET, ch);
+      }
+      break;
+
+      case ']': {
+        tok = newToken(Token.RBRACKET, ch);
+      }
+      break;
+      
       case '"':
         {
           tok = new Token(Token.STRING, readString());
