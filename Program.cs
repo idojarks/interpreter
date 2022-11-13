@@ -2,7 +2,9 @@
 
 var input = @"
 let a = [1, 2+3, 4*2];
-a[2]
+len(a);
+first(a);
+last(a);
 ";
 
 var l = new Lexer(input);

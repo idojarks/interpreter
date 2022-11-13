@@ -343,7 +343,7 @@ public class Parser {
       elements.Add(parseExpression(OperatorPrecedences.LOWEST));
     }
 
-    if (!expectPeek(Token.RBRACKET)) {
+    if (!expectPeek(end)) {
       return null;
     }
 
