@@ -7,6 +7,9 @@ public class Evaluator {
 
   public IObject Eval(Node node, Environment env) {
     switch (node) {
+      case HashLiteral _node: {
+        return evalHashLiteral(_node, env);
+      }
       case IndexExpression _node: {
         var left = Eval(_node.left, env);
 
@@ -198,6 +201,43 @@ public class Evaluator {
     return env;
   }
 
+  IObject evalHashLiteral(HashLiteral node, Environment env) {
+    var h = new Hash();
+
+    if (node.pairs == null) {
+      return h;
+    }
+
+    Dictionary<Int64, HashPair> pairs = new();
+
+    foreach (var item in node.pairs)
+    {
+      var k = Eval(item.Key, env);
+
+      if (isError(k)) {
+        return k;
+      }
+
+      if (k is IHashable hashKey) {
+        var v = Eval(item.Value, env);
+
+        if (isError(v)) {
+          return v;
+        }
+
+        var hashed = hashKey.HashKey();
+        pairs[hashed.value] = new HashPair(k, v);
+      }
+      else {
+        return newError($"evalHashLiteral() : unusable as hash key={k.Type()}");
+      }
+    }
+
+    h.pairs = pairs;
+
+    return h;
+  }
+
   IObject evalIndexExpression(IObject left, IObject index) {
     return left switch {
       ArrayObj ar => index switch {
@@ -205,8 +245,29 @@ public class Evaluator {
         Integer i => newError($"evalIndexExpression() : out of bound. array count = {ar.elements.Count}, index = {i.value}"),
         _ => newError($"evalIndexExpression() : not supported index type"),
       },
+      Hash hashObj => evalHashIndexExpression(hashObj, index),
       _ => newError($"evalIndexExpression() : {left} is not ArrayObj")
     };
+  }
+
+  IObject evalHashIndexExpression(Hash hashObj, IObject index) {
+    if (index is IHashable i) {
+      if (hashObj.pairs == null) {
+        return Objects.nullObj;
+      }
+
+      var hashKey = i.HashKey();
+
+      if (hashObj.pairs.TryGetValue(hashKey.value, out var v)) {
+        return v.value;
+      }
+      else {
+        return Objects.nullObj;
+      }
+    }
+    else {
+      return newError($"evalHashIndexExpression() : unusable as hash key={index.Type()}");
+    }
   }
 
   List<IObject> evalExpressions(List<Expression>? exps, Environment env) {

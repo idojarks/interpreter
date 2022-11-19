@@ -106,12 +106,10 @@ public class Lexer {
         tok = newToken(Token.LBRACKET, ch);
       }
       break;
-
       case ']': {
         tok = newToken(Token.RBRACKET, ch);
       }
       break;
-      
       case '"':
         {
           tok = new Token(Token.STRING, readString());
@@ -163,6 +161,9 @@ public class Lexer {
         break;
       case ';':
         tok = newToken(Token.SEMICOLON, ch);
+        break;
+      case ':':
+        tok = newToken(Token.COLON, ch);
         break;
       case '(':
         tok = newToken(Token.LPAREN, ch);

@@ -318,3 +318,35 @@ public class IndexExpression : Expression {
     return $"({left.String()}[{index.String()}])";
   }
 }
+
+public class HashLiteral : Expression {
+  public Dictionary<Expression, Expression>? pairs;
+  
+  public HashLiteral() : base(new Token(Token.LBRACE, "hash literal")) {}
+
+  public override string String()
+  {
+    StringBuilder sb = new();
+
+    sb.Append("{");
+
+    if (pairs != null) {
+      int count = 0;
+
+      foreach (var item in pairs)
+      {
+        ++count;
+
+        sb.Append($"{item.Key.String()} : {item.Value.String()}");
+
+        if (count < pairs.Count) {
+          sb.Append(", ");
+        }
+      }
+    }
+
+    sb.Append("}");
+
+    return sb.ToString();
+  }
+}

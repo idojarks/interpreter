@@ -1,6 +1,10 @@
 global using ObjectType = System.String;
 using System.Text;
 
+public interface IHashable {
+  public HashKey HashKey();
+}
+
 public interface IObject {
   ObjectType Type();
   string Inspect();
@@ -14,6 +18,7 @@ public interface IObject {
   const string STRING_OBJ = "STRING";
   const string BUILTIN_OBJ = "BUILTIN";
   const string ARRAY_OBJ = "ARRAY";
+  const string HASH_OBJ = "HASH";
 }
 
 public class Objects {
@@ -22,7 +27,7 @@ public class Objects {
   public static Null nullObj = new Null();
 }
 
-public class Integer : IObject {
+public class Integer : IObject, IHashable {
   public Int64 value;
 
   public Integer(Int64 v) {
@@ -36,9 +41,13 @@ public class Integer : IObject {
   public ObjectType Type() {
     return IObject.INTEGER_OBJ;
   } 
+
+  public HashKey HashKey() {
+    return new HashKey(Type(), value.GetHashCode());
+  }
 }
 
-public class StringObj : IObject {
+public class StringObj : IObject, IHashable {
   public string value;
 
   public StringObj(string s) {
@@ -51,10 +60,15 @@ public class StringObj : IObject {
 
   public ObjectType Type() {
     return IObject.STRING_OBJ;
-  } 
+  }
+
+  public HashKey HashKey() {
+    var hashCode = value.GetHashCode();
+    return new HashKey(Type(), hashCode);
+  }
 }
 
-public class Bool : IObject {
+public class Bool : IObject, IHashable {
   public bool value;
 
   public Bool(bool v) {
@@ -67,6 +81,19 @@ public class Bool : IObject {
 
   public ObjectType Type() {
     return IObject.BOOLEAN_OBJ;
+  }
+
+  public HashKey HashKey() {
+    Int64 v;
+
+    if (value == true) {
+      v = 1;
+    }
+    else {
+      v = 0;
+    }
+
+    return new HashKey(Type(), v.GetHashCode());
   }
 }
 
@@ -194,3 +221,57 @@ public class ArrayObj : IObject {
     return sb.ToString();
   }
 }
+
+public class HashKey {
+  public ObjectType type;
+  public Int64 value;
+
+  public HashKey(ObjectType t, Int64 v) {
+    type = t;
+    value = v;
+  }
+}
+
+public class HashPair {
+  public IObject key;
+  public IObject value;
+
+  public HashPair(IObject k, IObject v) {
+    key = k;
+    value = v;
+  }
+}
+
+public class Hash : IObject {
+  public Dictionary<Int64, HashPair>? pairs;
+
+  public ObjectType Type() {
+    return IObject.HASH_OBJ;
+  }
+
+  public string Inspect() {
+    StringBuilder sb = new();
+
+    sb.Append("{");
+
+    if (pairs != null) {
+      var count = 0;
+
+      foreach (var item in pairs)
+      {
+        sb.Append($"{item.Value.key.Inspect()} : {item.Value.value.Inspect()}");
+
+        ++count;        
+
+        if (count < pairs.Count) {
+          sb.Append(", ");
+        }
+      }
+    }
+
+    sb.Append("}");
+
+    return sb.ToString();
+  }
+}
+

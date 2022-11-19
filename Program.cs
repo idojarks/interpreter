@@ -1,10 +1,11 @@
 ﻿//new Repl().Start();
 
 var input = @"
-let a = [1, 2+3, 4*2];
-len(a);
-first(a);
-last(a);
+{
+  3:1,
+  4:2,
+  ""ewer"":5
+}[""ewer""];
 ";
 
 var l = new Lexer(input);

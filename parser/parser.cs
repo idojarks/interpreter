@@ -54,6 +54,7 @@ public class Parser {
     registerPrefix(Token.FUNCTION, parseFunctionLiteral);
     registerPrefix(Token.STRING, parseStringLiteral);
     registerPrefix(Token.LBRACKET, parseArrayLiteral);
+    registerPrefix(Token.LBRACE, parseHashLiteral);
     
     registerInfix(Token.PLUS, parseInfixExpression);
     registerInfix(Token.MINUS, parseInfixExpression);
@@ -313,13 +314,44 @@ public class Parser {
     return ar;
   }
 
+  Expression parseHashLiteral() {
+    var hash = new HashLiteral();
+    var dic = new Dictionary<Expression, Expression>();
+
+    while (peekToken.Type != Token.RBRACE) {
+      nextToken();
+
+      var key = parseExpression(OperatorPrecedences.LOWEST);
+
+      if (!expectPeek(Token.COLON)) {
+        return new InvalidExpression($"parseHashLiteral() : expected=: , but={peekToken.Type}");
+      }
+
+      nextToken();
+
+      var value = parseExpression(OperatorPrecedences.LOWEST);
+
+      dic[key] = value;
+
+      if (peekToken.Type != Token.RBRACE && !expectPeek(Token.COMMA)) {
+        return new InvalidExpression($"parseHashLiteral() : expected=}} or , , but={peekToken.Type}");
+      }
+
+      hash.pairs = dic;
+    }
+
+    nextToken();
+
+    return hash;
+  }
+
   Expression parseIndexExpression(Expression left) {
     nextToken();
 
     var index = parseExpression(OperatorPrecedences.LOWEST);
 
     if (!expectPeek(Token.RBRACKET)) {
-      return new InvalidExpression($"parseIndexExpression() : expected ]");
+      return new InvalidExpression($"parseIndexExpression() : expected=]");
     }
 
     return new IndexExpression(left, index);
