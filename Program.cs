@@ -1,11 +1,13 @@
 ﻿//new Repl().Start();
 
 var input = @"
-{
-  3:1,
-  4:2,
-  ""ewer"":5
-}[""ewer""];
+let a = {
+  ""john"":42+1,
+  ""yong"":41
+};
+a[""john""];
+let b = [1,2,3];
+b[2];
 ";
 
 var l = new Lexer(input);

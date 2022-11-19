@@ -2,6 +2,14 @@ public class Builtins {
   public Dictionary<string, Builtin> store = new();
 
   public Builtins() {
+    store["puts"] = new Builtin(delegate (IObject[] args) {
+      foreach (var item in args)
+      {
+        System.Console.WriteLine(item.Inspect());  
+      }
+      
+      return Objects.nullObj;
+    });
     store["len"] = new Builtin(delegate (IObject[] args) {
       if (args.Length == 0) {
         return new Integer(0);
